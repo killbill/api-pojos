@@ -223,3 +223,8 @@ Temporary Items
 *.tmproj
 *.tmproject
 tmtags
+
+
+input/**
+output/**
+killbill-api-catalog.xml
