@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,8 @@ import com.github.javaparser.utils.SourceRoot;
 public class  Implementation {
 
   private static final Log log = new Log(Implementation.class);
+  private static final Set<String> skip = new HashSet<String>(
+      Arrays.asList( "hashCode()", "toString()", "equals(java.lang.Object)"));
 
   private final Mapping mapping;
   private final ResolvedInterfaceDeclaration declaration;
@@ -67,7 +70,7 @@ public class  Implementation {
   private final List<Property> properties;
   private final List<String> imports;
 
-  private Implementation( ResolvedInterfaceDeclaration declaration, String namespace, String name, String base,
+  private Implementation(ResolvedInterfaceDeclaration declaration, String namespace, String name, String base,
       List<String> imports, List<Property> properties, List<Method> methods, Mapping mapping, Symbols symbols){
     this.declaration = declaration;
     this.namespace = namespace;
@@ -187,12 +190,13 @@ public class  Implementation {
     Symbols symbols, String namespace, String name, 
     ResolvedInterfaceDeclaration declaration){
     symbols = new Symbols(symbols);
-    List<MethodUsage> usages = Method.unique(traverse(declaration));
+    List<MethodUsage> usages = filter(Method.unique(traverse(declaration)));
     for(MethodUsage usage: usages){
       symbols.add(usage.getName());
     }
     Importer importer  = new Importer(symbols, namespace, name);
     importer.add(namespace, Namespaces.join(name, "Builder"));
+
     importer.add("java.lang", "java.lang.Boolean");
     importer.add("java.lang", "java.lang.Byte");
     importer.add("java.lang", "java.lang.Character");
@@ -209,9 +213,9 @@ public class  Implementation {
     importer.add("java.io"  , "java.io.Serializable");
     importer.add("java.util", "java.util.Objects");
     importer.add("java.util", "java.util.Arrays");
+
     importer.add(declaration.getPackageName() , declaration.getQualifiedName());
     ArrayList<ResolvedType> types = new ArrayList<ResolvedType>();
-
     for(MethodUsage usage : usages){
       gather(usage, types);
     }
@@ -220,6 +224,7 @@ public class  Implementation {
     Mapping mapping  = importer.getMapping();
     symbols =  importer.getSymbols();
     HashMap<String,String> fields = new  HashMap<String,String>();
+
     for(String id: Property.possible(usages)){
       if(!fields.containsKey(id)){
         int attempts = 0;
@@ -265,6 +270,16 @@ public class  Implementation {
         parameter.addModifier(Modifier.FINAL);
       }
     }
+  }
+  private static List<MethodUsage> filter(List<MethodUsage> usages){
+    if(usages != null){
+      for(int i = usages.size() - 1 ; i >= 0 ; i--){
+        if(skip.contains(Method.getSignature(usages.get(i)))){
+          usages.remove(i);
+        }
+      }
+    }
+    return usages;
   }
   private static List<MethodUsage> traverse(ResolvedInterfaceDeclaration declaration){
     ArrayList<MethodUsage> usages = new ArrayList<MethodUsage>();
