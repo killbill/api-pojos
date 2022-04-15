@@ -17,17 +17,17 @@
 package org.killbill.billing.tool.pojogen;
 
 public enum Modifier {
-  ABSTRACT,
-  FINAL,
-  PRIVATE,
-  PROTECTED,
-  PUBLIC,
-  STATIC,
-  SYNCHRONIZED,
-  TRANSIENT,
-  VOLATILE;
-  @Override
-  public String toString(){
-    return this.name().toLowerCase();
-  }
+    ABSTRACT,
+    FINAL,
+    PRIVATE,
+    PROTECTED,
+    PUBLIC,
+    STATIC,
+    SYNCHRONIZED,
+    TRANSIENT,
+    VOLATILE;
+    @Override
+    public String toString(){
+        return this.name().toLowerCase();
+    }
 }

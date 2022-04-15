@@ -16,19 +16,20 @@
 
 package org.killbill.billing.tool.pojogen;
 
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import org.apache.commons.io.IOUtils;
-public class Resources {
+import java.util.List;
 
-    private static final Log log = new Log(Resources.class);
+public class Service{
 
-    public static String asString(String name) throws Exception{
-        String result = null;
-        StringWriter writer = new StringWriter();
-        InputStream input = Resources.class.getClassLoader().getResourceAsStream(name);
-        IOUtils.copy(input, writer, StandardCharsets.UTF_8);
-        return writer.toString();
+    private final List<Module> modules;
+
+    public Service(List<Module> modules)
+    {
+        this.modules = modules;
+    }
+    public List<Module> getModules(){
+        return this.modules;
+    }
+    public static Service create(List<Module> modules){
+        return new Service(modules);
     }
 }

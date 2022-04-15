@@ -29,15 +29,19 @@
   -->
   <outputDirectory>output</outputDirectory>
   <!--
+    The directory to place the generated resources.
+  -->
+  <resourceDirectory>resources</resourceDirectory>
+  <!--
     The directory to place the generated Java source code of the unit tests.
   -->
   <testDirectory>test</testDirectory>
   <!--
-    Generate output for the following packages and interfaces
+    Generate output for the following packages
   -->
   <acceptedPackages>
     <!--
-    <package>org.killbill.billing.catalog.api</package>
+      <package>org.killbill.billing.catalog.api</package>
     -->
   </acceptedPackages>
   <!--
@@ -45,16 +49,28 @@
   -->
   <acceptedInterfaces>
     <!--
-    <interface>org.killbill.billing.catalog.api.Unit</interface>
+      <interface>org.killbill.billing.catalog.api.Unit</interface>
     -->
   </acceptedInterfaces>
   <!--
-    The list of types to use Comparable.compareTo() instead of Object.equals() for equality.
+    The list of types to use Comparable.compareTo() instead of Object.equals() for equality
   -->
   <comparableTypes>
-      <!--
+    <!--
       <type>org.joda.time.DateTime</type>
-      -->
-    </comparableTypes>
- </Settings>
+    -->
+  </comparableTypes>
+  <!--
+    The name of the static inner class implementing the Builder pattern for each generated POJO
+  -->
+  <builderClass>Builder</builderClass>
+  <!--
+    The name of the class implementing `com.fasterxml.jackson.databind.AbstractTypeResolver' for each package
+  -->
+  <resolverClass>Resolver</resolverClass>
+  <!--
+    The name of the class implementing`com.fasterxml.jackson.databind.Module` for each package
+  -->
+  <moduleClass>Module</moduleClass>
+</Settings>
 

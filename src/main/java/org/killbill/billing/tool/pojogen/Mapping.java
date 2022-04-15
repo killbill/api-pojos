@@ -18,32 +18,38 @@ package org.killbill.billing.tool.pojogen;
 
 import  java.util.HashMap;
 import  java.util.Map;
-public class Mapping extends HashMap<String, String>{
-  private static final Log log = new Log(Mapping.class);
-  public Mapping(){
-  }
-  public Mapping(Map<String,String> source){
-    super(source);
-  }
-  public String resolve(String key){
-    if(!containsKey(key)){
-      return key;
+
+public class Mapping extends HashMap<String, String> { 
+
+    private static final Log log = new Log(Mapping.class);
+
+    public Mapping(){
     }
-    return get(key);
-  }
-  public Mapping clone(){
-    return new Mapping(this);
-  }
-  public Symbols getSymbols(){
-    return new Symbols(this.values());
-  }
-  public static Mapping merge(Mapping... vargs){
-    Mapping result = new Mapping();
-    for(int i = 0 ; i < vargs.length ; i++){
-      for (Map.Entry<String, String> entry : vargs[i].entrySet()) {
-        result.put(entry.getKey(), entry.getValue());
-      }
+    public Mapping(Map<String,String> source){
+        super(source);
     }
-    return result;
-  }
+    public String resolve(Entity entity){
+        return resolve(entity.getName());
+    }
+    public String resolve(String key){
+        if(!containsKey(key)){
+            return key;
+        }
+        return get(key);
+    }
+    public Mapping clone(){
+        return new Mapping(this);
+    }
+    public Symbols getSymbols(){
+        return new Symbols(this.values());
+    }
+    public static Mapping merge(Mapping... vargs){
+        Mapping result = new Mapping();
+        for(int i = 0 ; i < vargs.length ; i++){
+            for (Map.Entry<String, String> entry : vargs[i].entrySet()) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
+    }
 }

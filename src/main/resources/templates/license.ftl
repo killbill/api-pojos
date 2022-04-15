@@ -1,3 +1,9 @@
+<#---------------------------------------------------------------------------->
+<#import "common.ftl" as common>
+<#---------------------------------------------------------------------------->
+<#macro render n=0>
+<#---------------------------------------------------------------------------->
+/* This is generated code, edit with caution! */
 /*
  * Copyright 2022-2022 The Billing Project, LLC
  *
@@ -13,22 +19,5 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-
-package org.killbill.billing.tool.pojogen;
-
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import org.apache.commons.io.IOUtils;
-public class Resources {
-
-    private static final Log log = new Log(Resources.class);
-
-    public static String asString(String name) throws Exception{
-        String result = null;
-        StringWriter writer = new StringWriter();
-        InputStream input = Resources.class.getClassLoader().getResourceAsStream(name);
-        IOUtils.copy(input, writer, StandardCharsets.UTF_8);
-        return writer.toString();
-    }
-}
+</#macro>
+<#---------------------------------------------------------------------------->

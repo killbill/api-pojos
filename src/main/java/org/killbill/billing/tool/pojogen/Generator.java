@@ -19,6 +19,7 @@ package org.killbill.billing.tool.pojogen;
 import java.nio.charset.Charset;
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays; 
 import java.util.HashMap;
@@ -56,164 +57,210 @@ import com.github.javaparser.utils.Pair;
 import com.github.javaparser.utils.SourceRoot;
 
 public  class  Generator {
-  private static final Log log = new Log(Generator.class);
-  static final String[] KEYWORDSPLUS = new String[]{
-    /* Java keywords */
-    "abstract",	"continue",	"for",	"new",	"switch",
-      "assert",	"default",	"goto",	"package",	"synchronized",
-      "boolean",	"do",	"if",	"private",	"this",
-      "break",	"double",	"implements",	"protected",	"throw",
-      "byte",	"else",	"import",	"public",	"throws",
-      "case",	"enum",	"instanceof",	"return",	"transient",
-      "catch",	"extends",	"int",	"short",	"try",
-      "char",	"final",	"interface",	"static",	"void",
-      "class",	"finally",	"long",	"strictfp",	"volatile",
-      "const","float",	"native",	"super",	"while",
-      /* plus */
-      "true",  "false", "null",
-      /* plus */
-      "equals", "hashCode", "toString",
-      /* plus */
-      "Builder"
-  };
-  private final Configuration configuration;
-  private final Symbols symbols;
+    private static final Log log = new Log(Generator.class);
+    private final Configuration configuration;
+    private final Symbols symbols;
 
-  public Generator(Configuration configuration) throws Exception{
-    this.configuration = configuration;
-    this.symbols =  new Symbols(Arrays.asList(KEYWORDSPLUS));
-  }
-  private List<SourceRoot> sources() throws IOException
-  {
-    ArrayList<SourceRoot> list = new ArrayList<SourceRoot>();
-    CombinedTypeSolver solver = new CombinedTypeSolver();
-    ParserConfiguration configuration = new ParserConfiguration();
-    configuration.setCharacterEncoding(this.configuration.getEncoding());
-    configuration.setSymbolResolver(new JavaSymbolSolver(solver));
-    solver.add(new ReflectionTypeSolver(true));
-
-    for(File dependency : this.configuration.getDependencies()){
-      if(dependency.exists()){
-        Iterator<File> jars =  FileUtils.iterateFiles(dependency,
-            new WildcardFileFilter("*.jar", IOCase.INSENSITIVE),
-            DirectoryFileFilter.INSTANCE);
-
-        while(jars.hasNext()){
-          File jar = jars.next();
-          log.trace("Added jar dependency: %s", jar);
-          solver.add(new JarTypeSolver(jar));
-        }
-      }else{
-        log.warn("Dependency directory <%s> does not exit.", dependency);
-      }
+    public Generator(Configuration configuration) throws Exception{
+        this.configuration = configuration;
+        this.symbols =  Symbols.java();
     }
-    for(File source : this.configuration.getSources()){
-      if(source.exists()){
-        log.trace("Added source directory: %s", source);
-        solver.add(new JavaParserTypeSolver(source, configuration));
-        list.add( new SourceRoot(source.toPath(), configuration));
-      }else{
-        log.warn("Source directory <%s> does not exit.", source);
-      }
-    }
-    if(list.isEmpty()){
-      log.error("No source directory added.");;
-    }
-    return list;
-  }
-  public void run() throws Exception{
-    ArrayList<ClassOrInterfaceDeclaration>  interfaces = new ArrayList<ClassOrInterfaceDeclaration>();
-    for( SourceRoot source : this.sources()){
-      List<ParseResult<CompilationUnit>>  results = source.tryToParse();
+    private List<SourceRoot> sources() throws IOException
+    {
+        ArrayList<SourceRoot> list = new ArrayList<SourceRoot>();
+        CombinedTypeSolver solver = new CombinedTypeSolver();
+        ParserConfiguration configuration = new ParserConfiguration();
+        configuration.setCharacterEncoding(this.configuration.getEncoding());
+        configuration.setSymbolResolver(new JavaSymbolSolver(solver));
+        solver.add(new ReflectionTypeSolver(true));
 
-      for(ParseResult<CompilationUnit> result: results){
-        if(result.isSuccessful()){
-          Optional<CompilationUnit> unit = result.getResult();
-          if(unit.isPresent()){
-            List<ClassOrInterfaceDeclaration> declarations = unit.get().findAll(ClassOrInterfaceDeclaration.class);
-            for(ClassOrInterfaceDeclaration declaration : declarations){
-              if( declaration.isInterface() && !declaration.isGeneric() &&!declaration.isNestedType()) {
-                interfaces.add(declaration); 
-              }
-            }
-          }
+        for(File dependency : this.configuration.getDependencies()){
+            if(dependency.exists()){
+                Iterator<File> jars =  FileUtils.iterateFiles(dependency,
+                        new WildcardFileFilter("*.jar", IOCase.INSENSITIVE),
+                        DirectoryFileFilter.INSTANCE);
 
-        }
-      }
-    }
-    if(interfaces.isEmpty()){
-      log.warn("No interface found in source code by JavaParser." +
-          "Please ensure that all your source code can be compiled and all the required dependencies are provided.");
-    }else{
-      ArrayList<Implementation> implementations = new ArrayList<Implementation>();
-      ArrayList<String> skipped = new ArrayList<String>();
-      for(ClassOrInterfaceDeclaration ast : interfaces){
-        Optional<String> fqn = ast.getFullyQualifiedName();
-        if(fqn.isPresent()){
-          try{
-            ResolvedReferenceTypeDeclaration  declaration  = ast.resolve();
-            if(this.configuration.accepts(declaration.getPackageName(), declaration.getQualifiedName())){
-              String namespace = this.configuration.rename(declaration.getPackageName());
-              String name = this.configuration.rename(declaration.getPackageName(), declaration.getQualifiedName());
-              Implementation implementation =  Implementation.create(this.configuration,
-                  this.symbols, namespace, name, declaration.asInterface());
-              implementations.add(implementation);
+                while(jars.hasNext()){
+                    File jar = jars.next();
+                    log.trace("Added jar dependency: %s", jar);
+                    solver.add(new JarTypeSolver(jar));
+                }
             }else{
-              skipped.add(declaration.getQualifiedName());
+                log.warn("Dependency directory <%s> does not exit.", dependency);
             }
-          }catch(UnsolvedSymbolException e){
-            log.trace("%s\n%s", fqn.get(), ast);
-            log.error("Unresolved symbol <%s> in interface %s", e.getName(), fqn.get());
-            throw e;
-          }catch(Exception e){
-            log.trace("%s\n%s", fqn.get(), ast);
-            log.error("Cannot implement interface %s", fqn.get());
-            throw e;
-          }
         }
-      }
-      for(Implementation implementation : implementations){
-        render(implementation);
-        render(new Test(implementation));
-      }
-      showSummary(skipped, implementations);
+        for(File source : this.configuration.getSources()){
+            if(source.exists()){
+                log.trace("Added source directory: %s", source);
+                solver.add(new JavaParserTypeSolver(source, configuration));
+                list.add( new SourceRoot(source.toPath(), configuration));
+            }else{
+                log.warn("Source directory <%s> does not exit.", source);
+            }
+        }
+        if(list.isEmpty()){
+            log.error("No source directory added.");;
+        }
+        return list;
     }
-  }
-  private void render(Implementation implementation) throws Exception{
-    List<String> path = Namespaces.path(implementation.getNamespace() ,implementation.getName());
-    File output =  FileUtils.getFile(this.configuration.getOutput(), path.toArray(new String[0]));
-    FileUtils.forceMkdirParent(output);
-    try( FileWriterWithEncoding writer = new FileWriterWithEncoding(output,this.configuration.getEncoding())){
-      this.configuration.getTemplates().render(implementation,  writer);
+    public void run() throws Exception{
+        ArrayList<ClassOrInterfaceDeclaration>  interfaces = new ArrayList<ClassOrInterfaceDeclaration>();
+        for( SourceRoot source : this.sources()){
+            List<ParseResult<CompilationUnit>>  results = source.tryToParse();
+
+            for(ParseResult<CompilationUnit> result: results){
+                if(result.isSuccessful()){
+                    Optional<CompilationUnit> unit = result.getResult();
+                    if(unit.isPresent()){
+                        List<ClassOrInterfaceDeclaration> declarations = unit.get().findAll(ClassOrInterfaceDeclaration.class);
+                        for(ClassOrInterfaceDeclaration declaration : declarations){
+                            if( declaration.isInterface() && !declaration.isGeneric() &&!declaration.isNestedType()) {
+                                interfaces.add(declaration); 
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        if(interfaces.isEmpty()){
+            log.warn("No interface found in source code by JavaParser." +
+                    "Please ensure that all your source code can be compiled and all the required dependencies are provided.");
+        }else{
+            ArrayList<Implementation> implementations = new ArrayList<Implementation>();
+            ArrayList<String> skipped = new ArrayList<String>();
+            for(ClassOrInterfaceDeclaration ast : interfaces){
+                Optional<String> fqn = ast.getFullyQualifiedName();
+                if(fqn.isPresent()){
+                    try{
+                        ResolvedReferenceTypeDeclaration  declaration  = ast.resolve();
+                        if(this.configuration.accepts(declaration.getPackageName(), declaration.getQualifiedName())){
+                            String namespace = this.configuration.rename(declaration.getPackageName());
+                            String name = this.configuration.rename(declaration.getPackageName(), declaration.getQualifiedName());
+                            Entity entity = new Entity(namespace, name);
+                            Entity base = new Entity(declaration);
+                            Implementation implementation =  Implementation.create(this.configuration, 
+                                    this.symbols, declaration.asInterface(), entity, base);
+                            implementations.add(implementation);
+                        }else{
+                            skipped.add(declaration.getQualifiedName());
+                        }
+                    }catch(UnsolvedSymbolException e){
+                        log.trace("%s\n%s", fqn.get(), ast);
+                        log.error("Unresolved symbol <%s> in interface %s", e.getName(), fqn.get());
+                        throw e;
+                    }catch(Exception e){
+                        log.trace("%s\n%s", fqn.get(), ast);
+                        log.error("Cannot implement interface %s", fqn.get());
+                        throw e;
+                    }
+                }
+            }
+
+            process(implementations);
+
+            showSummary(skipped, implementations);
+        }
     }
-    log.trace(implementation, output);
-  }
-  private void render(Test test) throws Exception{
-    if(this.configuration.getTest() != null){
-      List<String> path = Namespaces.path(test.getNamespace(), test.getName());
-      File output =  FileUtils.getFile(this.configuration.getTest(), path.toArray(new String[0]));
-      FileUtils.forceMkdirParent(output);
-      try( FileWriterWithEncoding writer = new FileWriterWithEncoding(output,this.configuration.getEncoding())){
-        this.configuration.getTemplates().render(test,  writer);
-      }
+    private void process(List<Implementation> implementations) throws Exception{
+
+        if(!implementations.isEmpty()){
+            ArrayList<Resolver> resolvers = new ArrayList<Resolver>();
+            ArrayList<Module>  modules = new ArrayList<Module>();
+            ArrayList<Test> tests = new ArrayList<Test>();
+
+            if(this.configuration.getTest() != null){
+                for(Implementation implementation : implementations){
+                    Test test = Test.create(this.configuration, this.symbols, implementation);
+                    tests.add(test);
+                }
+            }
+            if(this.configuration.getResolver() != null){
+                HashMap<String, List<Implementation> > map = new HashMap<String, List<Implementation> >();
+
+                for(Implementation implementation : implementations){
+                    if(!map.containsKey(implementation.getNamespace())){
+                        map.put(implementation.getNamespace(), new ArrayList<Implementation>());
+                    }
+                    map.get(implementation.getNamespace()).add(implementation);
+                }
+                for(String namespace: map.keySet()){
+                    Resolver  resolver = Resolver.create(this.configuration, this.symbols,namespace, Implementation.sort(map.get(namespace)));
+                    resolvers.add(resolver);
+                }
+            }
+            if(this.configuration.getModule()!= null){
+                for(Resolver resolver: resolvers){
+                    Module module  = Module.create(this.configuration, this.symbols, resolver);
+                    modules.add(module);
+                }
+            }
+            Service service = (this.configuration.getResource() != null &&  modules.size() > 0) ?  Service.create(modules) : null;
+
+            for(Implementation implementation : implementations){
+                render(implementation);
+            }
+            for(Resolver resolver : resolvers){
+                render(resolver);
+            }
+            for(Module module : modules){
+                render(module);
+            }
+            if(service!=null){
+                render(service);
+            }
+            for(Test test : tests){
+                render(test);
+            }
+        }
     }
-  }
-  private void showSummary(List<String> skipped, List<Implementation> implementations){
-    if(!skipped.isEmpty() || !implementations.isEmpty()){
-      StringBuilder s =new StringBuilder();
-      s.append("  > Summary\n\n");
-      for(String name : skipped){
-        s.append(String.format("    > [SKIPPED] %s\n", name));
-      }
-      s.append("\n");
-      for(Implementation implementation: implementations){
-        List<String> path = Namespaces.path(implementation.getNamespace() ,implementation.getName());
-        File output =  FileUtils.getFile(this.configuration.getOutput(), path.toArray(new String[0]));
-        s.append(String.format("    > [IMPLEMENTED] %s\n", implementation.getBase()));
-        s.append(String.format("        as %s\n", implementation.getName()));
-        s.append(String.format("        at %s\n\n", output));
-      }
-      log.info(s);
+    private void write(File output,  String content) throws Exception{
+        FileUtils.forceMkdirParent(output);
+        try( FileWriterWithEncoding writer = new FileWriterWithEncoding(output,this.configuration.getEncoding())){
+            writer.write(content);
+        }
     }
-  }
+    private void render(Implementation implementation) throws Exception{
+        File output = Namespaces.file(this.configuration.getOutput(), implementation.getNamespace(), implementation.getName());
+        String content = this.configuration.getTemplates().render(implementation);
+        write(output, content);
+        log.trace(implementation, output);
+    }
+    private void render(Resolver resolver) throws Exception{
+        File output = Namespaces.file(this.configuration.getOutput(), resolver.getNamespace(), resolver.getName());
+        String content = this.configuration.getTemplates().render(resolver);
+        write(output, content);
+    }
+    private void render(Module module) throws Exception{
+        File output = Namespaces.file(this.configuration.getOutput(), module.getNamespace(), module.getName());
+        String content = this.configuration.getTemplates().render(module);
+        write(output, content);
+    }
+    private void render(Service service) throws Exception{
+        File output = new File(this.configuration.getResource(), "META-INF/services/com.fasterxml.jackson.databind.Module");
+        String content = this.configuration.getTemplates().render(service);
+        write(output, content);
+    }
+    private void render(Test test) throws Exception{
+        File output = Namespaces.file(this.configuration.getTest(),test.getNamespace(), test.getName());
+        String content = this.configuration.getTemplates().render(test);
+        write(output, content);
+    }
+    private void showSummary(List<String> skipped, List<Implementation> implementations){
+        if(!skipped.isEmpty() || !implementations.isEmpty()){
+            StringBuilder s =new StringBuilder();
+            s.append("  > Summary\n\n");
+            for(String name : skipped){
+                s.append(String.format("    > [SKIPPED] %s\n", name));
+            }
+            s.append("\n");
+            for(Implementation implementation: implementations){
+                File output = Namespaces.file(this.configuration.getOutput(), implementation.getNamespace(), implementation.getName());
+                s.append(String.format("    > [IMPLEMENTED] %s\n", implementation.getBase()));
+                s.append(String.format("        as %s\n", implementation.getName()));
+                s.append(String.format("        at %s\n\n", output));
+            }
+            log.info(s);
+        }
+    }
 }

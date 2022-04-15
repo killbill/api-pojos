@@ -21,24 +21,24 @@ import java.util.Map;
 
 public class Annotation {
 
-  private static final Log log = new Log(Annotation.class);
+    private static final Log log = new Log(Annotation.class);
 
-  private final String name;
-  private final Mapping mapping;
-  private final String content;
+    private final String content;
+    private final String name;
+    private final Mapping mapping;
 
-  public Annotation(String name, Mapping mapping){
-    this(name, null, mapping);
-  }
-  public Annotation(String name, String content, Mapping mapping){
-    this.name = name;
-    this.mapping = new Mapping(mapping);
-    this.content = content;
-  }
-  @Override
-  public String toString(){
-    return String.format("@%s%s",
-         this.mapping.resolve(this.name),
-         (this.content ==  null) ? "" : String.format("(%s)", this.content));
-  }
+    public Annotation(String name, Mapping mapping){
+        this(name, null, mapping);
+    }
+    public Annotation(String name, String content, Mapping mapping){
+        this.name = name;
+        this.mapping = new Mapping(mapping);
+        this.content = content;
+    }
+    @Override
+    public String toString(){
+        return String.format("@%s%s",
+                this.mapping.resolve(this.name),
+                (this.content ==  null) ? "" : String.format("(%s)", this.content));
+    }
 }

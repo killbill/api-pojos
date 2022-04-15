@@ -27,70 +27,90 @@ import java.util.Set;
 
 class Configuration {
 
-  private static final Log log = new Log(Configuration.class);
+    private static final Log log = new Log(Configuration.class);
 
-  private final Charset encoding;
-  private final File output;
-  private final File test;
-  private final Settings settings;
-  private final String prefix;
-  private final String suffix;
-  private final String subpackage;
-  private final Templates templates;
-  private final List<File> dependencies;
-  private final List<File> sources;
-  private final Set<String> comparables;
-  private final Set<String> interfaces;
-  private final Set<String> namespaces;
+    private final Charset encoding;
+    private final File output;
+    private final File resource;
+    private final File test;
+    private final Settings settings;
+    private final String builder;
+    private final String module;
+    private final String prefix;
+    private final String resolver; 
+    private final String subpackage;
+    private final String suffix;
+    private final Templates templates;
+    private final List<File> dependencies;
+    private final List<File> sources;
+    private final Set<String> comparables;
+    private final Set<String> interfaces;
+    private final Set<String> namespaces;
 
-  public Configuration(Charset encoding, Templates templates, Settings settings){
-    this.encoding = encoding;
-    this.templates = templates;
-    this.settings = settings;
-    this.dependencies = new ArrayList<File>(this.settings.getDependencies());
-    this.sources = new ArrayList<File>(this.settings.getSources());
-    this.output = this.settings.getOutput() ;
-    this.namespaces = new HashSet<String>(this.settings.getPackages());
-    this.interfaces = new HashSet<String>(this.settings.getInterfaces());
-    this.comparables = new HashSet<String>(this.settings.getComparables());
-    this.subpackage  = this.settings.getSubpackage();
-    this.prefix= this.settings.getPrefix();
-    this.suffix = this.settings.getSuffix();
-    this.test = this.settings.getTest();
-  }
-  public String rename(String namespace, String name){
-    String id = Namespaces.id(namespace,name);
-    return  Namespaces.join( rename(namespace) , this.prefix + id + this.suffix );
-  }
-  public String rename(String namespace){
-    return  Namespaces.join(namespace, this.subpackage);
-  }
-  public boolean accepts(String namespace, String name){
-    if(this.namespaces.isEmpty() && this.interfaces.isEmpty()){
-      return true;
-    }else{
-      return this.namespaces.contains(namespace)|| this.interfaces.contains(name);
+    public Configuration(Charset encoding, Templates templates, Settings settings){
+        this.encoding = encoding;
+        this.settings = settings;
+        this.templates = templates;
+        this.sources = new ArrayList<File>(this.settings.getSources());
+        this.dependencies = new ArrayList<File>(this.settings.getDependencies());
+        this.comparables = new HashSet<String>(this.settings.getComparables());
+        this.interfaces = new HashSet<String>(this.settings.getInterfaces());
+        this.namespaces = new HashSet<String>(this.settings.getPackages());
+        this.test = this.settings.getTest();
+        this.resource = this.settings.getResource();
+        this.subpackage  = this.settings.getSubpackage();
+        this.suffix = this.settings.getSuffix();
+        this.prefix= this.settings.getPrefix();
+        this.resolver = this.settings.getResolver();
+        this.module = this.settings.getModule();
+        this.output = this.settings.getOutput() ;
+        this.builder = this.settings.getBuilder();
     }
-  }
-  public boolean isComparable(String name){
-    return this.comparables.contains(name);
-  }
-  public List<File> getDependencies() {
-    return this.dependencies;
-  }
-  public Charset getEncoding() {
-    return this.encoding;
-  }
-  public List<File> getSources() {
-    return this.sources;
-  }
-  public  Templates getTemplates() {
-    return this.templates;
-  }
-  public File getOutput() {
-    return this.output;
-  }
-  public File getTest() {
-    return this.test;
-  }
+    public String rename(String namespace, String name){
+        String id = Namespaces.id(namespace,name);
+        return  Namespaces.join( rename(namespace) , this.prefix + id + this.suffix );
+    }
+    public String rename(String namespace){
+        return  Namespaces.join(namespace, this.subpackage);
+    }
+    public boolean accepts(String namespace, String name){
+        if(this.namespaces.isEmpty() && this.interfaces.isEmpty()){
+            return true;
+        }else{
+            return this.namespaces.contains(namespace)|| this.interfaces.contains(name);
+        }
+    }
+    public boolean isComparable(String name){
+        return this.comparables.contains(name);
+    }
+    public String getBuilder(){
+        return this.builder;
+    }
+    public List<File> getDependencies() {
+        return this.dependencies;
+    }
+    public Charset getEncoding() {
+        return this.encoding;
+    }
+    public String getModule(){
+        return this.module;
+    }
+    public File getOutput() {
+        return this.output;
+    }
+    public String getResolver(){
+        return this.resolver;
+    }
+    public File getResource() {
+        return this.resource;
+    }
+    public List<File> getSources() {
+        return this.sources;
+    }
+    public  Templates getTemplates() {
+        return this.templates;
+    }
+    public File getTest() {
+        return this.test;
+    }
 }

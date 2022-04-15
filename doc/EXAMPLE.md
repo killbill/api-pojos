@@ -75,13 +75,44 @@ cd ..
 
 ```
 
-Add the following dependency to the Maven project file `output/project/pom.xml`. This is required to build the POJOs and their tests.
+Add the following dependencies to the Maven project file `output/project/pom.xml`. They are required to build the POJOs and their tests.
 
 ```xml
 <dependency>
     <groupId>org.kill-bill.billing</groupId>
     <artifactId>killbill-api</artifactId>
     <version>0.53.17</version>
+</dependency>
+<dependency>
+  <groupId>joda-time</groupId>
+  <artifactId>joda-time</artifactId>
+  <version>2.10.14</version>
+</dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.13.2</version>
+</dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-annotations</artifactId>
+    <version>2.13.2</version>
+</dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-core</artifactId>
+    <version>2.13.2</version>
+</dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.datatype</groupId>
+    <artifactId>jackson-datatype-joda</artifactId>
+    <version>2.13.2</version>
+</dependency>
+<dependency>
+    <groupId>org.testng</groupId>
+    <artifactId>testng</artifactId>
+    <version>7.5</version>
+    <scope>test</scope>
 </dependency>
 ```
 
@@ -103,6 +134,7 @@ Create a file containing the folowing xml and save it as killbill-api-catalog.xm
   <outputClassPrefix></outputClassPrefix>
   <outputClassSuffix>Imp</outputClassSuffix>
   <outputDirectory>output/project/src/main/java</outputDirectory>
+  <resourceDirectory>output/project/src/main/resources</resourceDirectory>
   <testDirectory>output/project/src/test/java</testDirectory>
   <acceptedPackages>
     <package>org.killbill.billing.catalog.api</package>
@@ -112,6 +144,9 @@ Create a file containing the folowing xml and save it as killbill-api-catalog.xm
   <comparableTypes>
     <type>org.joda.time.DateTime</type>
   </comparableTypes>
+  <builderClass>Builder</builderClass>
+  <resolverClass>Resolver</resolverClass>
+  <moduleClass>Module</moduleClass>
 </Settings>
 
 ```
@@ -174,6 +209,12 @@ Tells the tool to save the Java source code for the POJOs in `output/project/src
 
 
 ```xml
+  <resourceDirectory>output/project/src/main/resources</resourceDirectory>
+```
+Tells the tool to save the generated resources in `output/project/src/main/resources`.
+
+
+```xml
   <testDirectory>output/project/src/test/java</testDirectory>
 ```
 Tells the tool to save the Java source code for the tests in `output/project/src/test/java`.
@@ -199,6 +240,23 @@ No particular interface specified.
       <type>org.joda.time.DateTime</type>
   </comparableTypes>
 ```
-Tells the tool to generate POJOs that uses `java.lang.Comparable.compareTo()` instead of `java.lang.Object.equals()` when comparing `org.joda.time.DateTime`.
+Tells the tool to generate POJOs that uses `java.lang.Comparable.compareTo()` instead of `java.lang.Object.equals()` when comparing instances of `org.joda.time.DateTime`.
+
+```xml
+  <builderClass>Builder</builderClass>
+```
+Tells the tool to name the static inner class implementing the Builder pattern for each generated POJO `Builder`.
+
+
+```xml
+  <resolverClass>Resolver</resolverClass>
+```
+Tells the tool to name the class implementing `com.fasterxml.jackson.databind.AbstractTypeResolver' for each package `Resolver`.
+
+
+```xml
+  <moduleClass>Module</moduleClass>
+```
+Tells the tool to name the class implementing `com.fasterxml.jackson.databind.Module` for each package `Module`.
 
 

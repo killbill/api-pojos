@@ -5,7 +5,7 @@
 <modelVersion>4.0.0</modelVersion>
 <groupId>org.kill-bill.billing.tool</groupId>
 <artifactId>pojogen</artifactId>
-<version>1.0-SNAPSHOT</version>
+<version>1.1-SNAPSHOT</version>
 <name>pojogen</name>
 <properties>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -13,12 +13,6 @@
   <maven.compiler.target>1.7</maven.compiler.target>
 </properties>
 <dependencies>
-  <dependency>
-    <groupId>junit</groupId>
-    <artifactId>junit</artifactId>
-    <version>4.11</version>
-    <scope>test</scope>
-  </dependency>
   <dependency>
     <groupId>com.github.javaparser</groupId>
     <artifactId>javaparser-core</artifactId>
