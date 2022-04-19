@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Settings>
   <!--
-    The directories containing Java source code.
+      The directories containing Java source code. 
+      Each directory should be the root directory of a Java Package Structure.
+      In a Java Package Structure, each subdirectory of corresponds to a Java package.
   -->
   <sourceDirectories>
     <sourceDirectory>input/project/src/main/java</sourceDirectory>
@@ -25,7 +27,7 @@
   -->
   <outputClassSuffix>Imp</outputClassSuffix>
   <!--
-    The directory to place the generated Java source code of the POJOs.
+    The directory to output the Java Package Structure of the POJOs.
   -->
   <outputDirectory>output/project/src/main/java</outputDirectory>
   <!--
@@ -33,11 +35,11 @@
   -->
   <resourceDirectory>output/project/src/main/resources</resourceDirectory>
   <!--
-    The directory to place the generated Java source code of the unit tests.
+    The directory to output the Java Package Structure of the the test units.
   -->
   <testDirectory>output/project/src/test/java</testDirectory>
   <!--
-    Generate output for the following packages
+    Generate output for the following packages.
   -->
   <acceptedPackages>
     <package>org.killbill.billing</package>
@@ -79,7 +81,7 @@
     <package>org.killbill.billing.invoice.api.formatters</package>
   </acceptedPackages>
   <!--
-    Generate output for the following interfaces
+    Generate output for the following interfaces.
   -->
   <acceptedInterfaces>
   <!--
@@ -95,15 +97,15 @@
       <type>org.joda.time.LocalDate</type>
   </comparableTypes>
   <!--
-    The name of the static inner class implementing the Builder pattern for each generate POJO
+    The name of the static inner class implementing the Builder pattern for each generate POJO.
   -->
   <builderClass>Builder</builderClass>
   <!--
-    The name of the class extending `com.fasterxml.jackson.databind.AbstractTypeResolver' for each package
+    The name of the class extending `com.fasterxml.jackson.databind.AbstractTypeResolver' for each package.
   -->
   <resolverClass>Resolver</resolverClass>
   <!--
-    The name of the class extending `com.fasterxml.jackson.databind.Module` for each package
+    The name of the class extending `com.fasterxml.jackson.databind.Module` for each package.
   -->
   <moduleClass>Module</moduleClass>
  </Settings>

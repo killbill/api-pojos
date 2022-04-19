@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Settings>
   <!--
-    The directories containing Java source code.
+      The directories containing Java source code. 
+      Each directory should be the root directory of a Java Package Structure.
+      In a Java Package Structure, each subdirectory of corresponds to a Java package.
   -->
   <sourceDirectories>
-    <sourceDirectory>input</sourceDirectory>
+    <sourceDirectory>input/project/src/main/java</sourceDirectory>
   </sourceDirectories>
   <!--
     The directories containing Jar dependencies of the source code.
   -->
   <dependencyDirectories>
-    <dependencyDirectory>lib</dependencyDirectory>
+    <dependencyDirectory>input/lib</dependencyDirectory>
   </dependencyDirectories>
   <!--
     The subpackage to place the generated classes.
@@ -25,52 +27,86 @@
   -->
   <outputClassSuffix>Imp</outputClassSuffix>
   <!--
-    The directory to place the generated Java source code of the POJOs.
+    The directory to output the Java Package Structure of the POJOs.
   -->
-  <outputDirectory>output</outputDirectory>
+  <outputDirectory>output/project/src/main/java</outputDirectory>
   <!--
     The directory to place the generated resources.
   -->
-  <resourceDirectory>resources</resourceDirectory>
+  <resourceDirectory>output/project/src/main/resources</resourceDirectory>
   <!--
-    The directory to place the generated Java source code of the unit tests.
+    The directory to output the Java Package Structure of the the test units.
   -->
-  <testDirectory>test</testDirectory>
+  <testDirectory>output/project/src/test/java</testDirectory>
   <!--
-    Generate output for the following packages
+    Generate output for the following packages.
   -->
   <acceptedPackages>
-    <!--
-      <package>org.killbill.billing.catalog.api</package>
-    -->
+    <package>org.killbill.billing</package>
+    <package>org.killbill.billing.tenant</package>
+    <package>org.killbill.billing.tenant.api</package>
+    <package>org.killbill.billing.util</package>
+    <package>org.killbill.billing.util.customfield</package>
+    <package>org.killbill.billing.util.nodes</package>
+    <package>org.killbill.billing.util.entity</package>
+    <package>org.killbill.billing.util.audit</package>
+    <package>org.killbill.billing.util.queue</package>
+    <package>org.killbill.billing.util.callcontext</package>
+    <package>org.killbill.billing.util.api</package>
+    <package>org.killbill.billing.util.tag</package>
+    <package>org.killbill.billing.security</package>
+    <package>org.killbill.billing.security.api</package>
+    <package>org.killbill.billing.payment</package>
+    <package>org.killbill.billing.payment.plugin</package>
+    <package>org.killbill.billing.payment.plugin.api</package>
+    <package>org.killbill.billing.payment.api</package>
+    <package>org.killbill.billing.catalog</package>
+    <package>org.killbill.billing.catalog.api</package>
+    <package>org.killbill.billing.catalog.api.rules</package>
+    <package>org.killbill.billing.osgi</package>
+    <package>org.killbill.billing.osgi.api</package>
+    <package>org.killbill.billing.osgi.api.config</package>
+    <package>org.killbill.billing.usage</package>
+    <package>org.killbill.billing.usage.api</package>
+    <package>org.killbill.billing.account</package>
+    <package>org.killbill.billing.account.api</package>
+    <package>org.killbill.billing.entitlement</package>
+    <package>org.killbill.billing.entitlement.api</package>
+    <package>org.killbill.billing.currency</package>
+    <package>org.killbill.billing.currency.api</package>
+    <package>org.killbill.billing.overdue</package>
+    <package>org.killbill.billing.overdue.api</package>
+    <package>org.killbill.billing.invoice</package>
+    <package>org.killbill.billing.invoice.api</package>
+    <package>org.killbill.billing.invoice.api.formatters</package>
   </acceptedPackages>
   <!--
-    Generate output for the following interfaces
+    Generate output for the following interfaces.
   -->
   <acceptedInterfaces>
-    <!--
-      <interface>org.killbill.billing.catalog.api.Unit</interface>
-    -->
+  <!--
+    <interface> org.killbill.billing.catalog.api.Unit</interface>
+  -->
   </acceptedInterfaces>
   <!--
-    The list of types to use Comparable.compareTo() instead of Object.equals() for equality
+    The list of types to use Comparable.compareTo() instead of Object.equals() for equality.
   -->
   <comparableTypes>
-    <!--
+      <type>java.math.BigDecimal</type>
       <type>org.joda.time.DateTime</type>
-    -->
+      <type>org.joda.time.LocalDate</type>
   </comparableTypes>
   <!--
-    The name of the static inner class implementing the Builder pattern for each generated POJO
+    The name of the static inner class implementing the Builder pattern for each generate POJO.
   -->
   <builderClass>Builder</builderClass>
   <!--
-    The name of the class implementing `com.fasterxml.jackson.databind.AbstractTypeResolver' for each package
+    The name of the class extending `com.fasterxml.jackson.databind.AbstractTypeResolver' for each package.
   -->
   <resolverClass>Resolver</resolverClass>
   <!--
-    The name of the class implementing`com.fasterxml.jackson.databind.Module` for each package
+    The name of the class extending `com.fasterxml.jackson.databind.Module` for each package.
   -->
   <moduleClass>Module</moduleClass>
-</Settings>
+ </Settings>
 

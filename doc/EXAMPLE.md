@@ -182,15 +182,15 @@ cd ../..
     <sourceDirectory>input/project/src/main/java</sourceDirectory>
   </sourceDirectories>
 ```
-Tells the tool to look for the Java source code of killbill-api in `input/project/src/main/java`.
-
+Tells the tool that the root directory of the Java Package Structure of `killbill-api` is `input/project/src/main/java`.
+In a Java Package Structure, each subdirectory corresponds to a Java package.
 
 ```xml
   <dependencyDirectories>
     <dependencyDirectory>input/lib</dependencyDirectory>
   </dependencyDirectories>
 ```
-Tells the tool where to look for the JAR dependencies of killbill-api in `input/lib`.
+Tells the tool that the JAR dependencies of `killbill-api` is in `input/lib`.
 
 
 ```xml
@@ -205,19 +205,18 @@ For example, the interface `org.killbill.billing.catalog.api.Unit` would have a 
 ```xml
   <outputDirectory>output/project/src/main/java</outputDirectory>
 ```
-Tells the tool to save the Java source code for the POJOs in `output/project/src/main/java`.
-
+Tells the tool to output the Java Package Structure of the generated POJOs in `output/project/src/main/java`.
 
 ```xml
   <resourceDirectory>output/project/src/main/resources</resourceDirectory>
 ```
-Tells the tool to save the generated resources in `output/project/src/main/resources`.
+Tells the tool to output the generated resources in `output/project/src/main/resources`.
 
 
 ```xml
   <testDirectory>output/project/src/test/java</testDirectory>
 ```
-Tells the tool to save the Java source code for the tests in `output/project/src/test/java`.
+Tells the tool to output the Java Package Structure of the the test units in `output/project/src/test/java`.
 
 
 ```xml
@@ -258,5 +257,4 @@ Tells the tool to name the class implementing `com.fasterxml.jackson.databind.Ab
   <moduleClass>Module</moduleClass>
 ```
 Tells the tool to name the class implementing `com.fasterxml.jackson.databind.Module` for each package `Module`.
-
 
