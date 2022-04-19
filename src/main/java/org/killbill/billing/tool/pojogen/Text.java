@@ -17,45 +17,57 @@
 package org.killbill.billing.tool.pojogen;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Stack;
 
-public class Text{
-  public static void append(StringBuilder s, int tabs, Object o ){
-    String indent  =  new String(new char[tabs]).replace("\0", " ");
-    s.append(String.format("%s%s\n", indent, o.toString())) ;
-  }
-  public static void append(StringBuilder s, Object o ){
-    append(s, 0,  o);
-  }
-  public static void append(StringBuilder s){
-    append(s, "");
-  }
-  public static boolean zero(String s){
-    return (s == null) || (s.length() == 0);
-  }
-  public static List<String> toStrings(List<?> list){
-    ArrayList<String> strings = new ArrayList<String>();
-    for(Object o : list){
-      strings.add(Objects.toString(o));
+public class Text {
+    public static void append(StringBuilder s, int tabs, Object o) {
+        String indent = new String(new char[tabs]).replace("\0", " ");
+        s.append(String.format("%s%s\n", indent, o.toString()));
     }
-    return strings;
-  }
-  public static String indent(String s, int spaces){
-    String prefix = "";
-    for(int i = 0 ; i< spaces ; i++){
-      prefix =  prefix + " ";
+
+    public static void append(StringBuilder s, Object o) {
+        append(s, 0, o);
     }
-    String[] array = s.split("\n");
-    for(int i= 0 ; i < array.length ; i++){
-      if(array[i].length() > 0){
-        array[i] =  prefix +  array[i];
-      }
+
+    public static void append(StringBuilder s) {
+        append(s, "");
     }
-    return String.join("\n", array);
-  }
+
+    public static boolean zero(String s) {
+        return (s == null) || (s.length() == 0);
+    }
+
+    public static String capitalize(String s) {
+        if ((s == null) || (s.length() == 0)) {
+            return "";
+        }
+        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    public static String quote(String s) {
+        return ("\"" + ((s == null) ? "" : s) + "\"");
+    }
+
+    public static List<String> toStrings(List<?> list) {
+        ArrayList<String> strings = new ArrayList<String>();
+        for (Object o : list) {
+            strings.add(Objects.toString(o));
+        }
+        return strings;
+    }
+
+    public static String indent(String s, int spaces) {
+        String prefix = "";
+        for (int i = 0; i < spaces; i++) {
+            prefix = prefix + " ";
+        }
+        String[] array = s.split("\n");
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].length() > 0) {
+                array[i] = prefix + array[i];
+            }
+        }
+        return String.join("\n", array);
+    }
 }

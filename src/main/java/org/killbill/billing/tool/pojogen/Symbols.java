@@ -16,24 +16,48 @@
 
 package org.killbill.billing.tool.pojogen;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class Symbols extends HashSet<String>{
-  private static final Log log = new Log(Symbols.class);
-  public Symbols(){
-  }
-  public Symbols(Collection<String> source){
-    super(source);
-  }
-  public Symbols clone(){
-    return new Symbols(this);
-  }
-  public static Symbols union(Symbols ... vargs){
-    Symbols result = new Symbols();
-    for( int i = 0 ; i < vargs.length ; i++){
-      result.addAll( vargs[i]);
+public class Symbols extends HashSet<String> {
+    static final String[] JAVA = new String[]{
+            /* Java keywords */
+            "abstract", "continue", "for", "new", "switch",
+            "assert", "default", "goto", "package", "synchronized",
+            "boolean", "do", "   if", "private", "this",
+            "break", "double", "implements", "protected", "throw",
+            "byte", "else", "import", "public", "throws",
+            "case", "enum", "instanceof", "return", "transient",
+            "catch", "extends", "int", "short", "try",
+            "char", "final", "interface", "static", "void",
+            "class", "finally", "long", "strictfp", "volatile",
+            "const", "   float", "native", "super", "while",
+            /* plus */
+            "true", "false", "null"
+    };
+    private static final Log log = new Log(Symbols.class);
+
+    public Symbols() {
     }
-    return result;
-  }
+
+    public Symbols(Collection<String> source) {
+        super(source);
+    }
+
+    public Symbols clone() {
+        return new Symbols(this);
+    }
+
+    public static Symbols union(Symbols... vargs) {
+        Symbols result = new Symbols();
+        for (int i = 0; i < vargs.length; i++) {
+            result.addAll(vargs[i]);
+        }
+        return result;
+    }
+
+    public static Symbols java() {
+        return new Symbols(Arrays.asList(JAVA));
+    }
 }

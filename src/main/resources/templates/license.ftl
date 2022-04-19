@@ -1,3 +1,9 @@
+<#---------------------------------------------------------------------------->
+<#import "common.ftl" as common>
+<#---------------------------------------------------------------------------->
+<#macro render n=0>
+<#---------------------------------------------------------------------------->
+/* This is generated code, edit with caution! */
 /*
  * Copyright 2022-2022 The Billing Project, LLC
  *
@@ -13,22 +19,5 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-
-package org.killbill.billing.tool.pojogen;
-
-public enum Modifier {
-    ABSTRACT,
-    FINAL,
-    PRIVATE,
-    PROTECTED,
-    PUBLIC,
-    STATIC,
-    SYNCHRONIZED,
-    TRANSIENT,
-    VOLATILE;
-
-    @Override
-    public String toString() {
-        return this.name().toLowerCase();
-    }
-}
+</#macro>
+<#---------------------------------------------------------------------------->

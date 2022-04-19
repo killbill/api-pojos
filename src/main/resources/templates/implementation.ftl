@@ -1,159 +1,142 @@
-
+<#import "common.ftl" as common>
+<#import "license.ftl" as license>
+<#import "unit.ftl" as unit>
 <#---------------------------------------------------------------------------->
-<#macro join items=[] separator=" " prefix="" suffix="" >
-    <#if (items?size gt 0) >
-        ${ prefix + items?join(separator) + suffix }<#t>
-    </#if>
+<#macro renderParameter parameter name>
+    <@common.join items=parameter.annotations separator=" " prefix="" suffix=" " />
+    <@common.join items=parameter.modifiers separator=" " prefix="" suffix=" " />
+      ${parameter.type}<#if parameter.variadic > ...</#if> ${name}<#t>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro block shift=0 >
-    <#local capture>
-        <#nested>
-    </#local>
-    <#--
-    <#local lines = capture?remove_beginning("\n")?remove_ending("\n")?split("\n") >
-    -->
-    <#local lines = capture?split("\n") >
-    <#list lines as line >
-        <#if ( line?index lt (lines?size - 1) ) >
-            <#if shift lt 0 >
-                <#if (line?length gt -shift) >
-                    ${ line[-shift..] }<#t>
-                <#else>
-                    ${""}<#t>
-                </#if>
-            <#else>
-                <#if line?trim?length gt 0 >
-                  ${ line?left_pad( line?length + shift ) }<#t>
-                <#else>
-                    ${""}<#t>
-                </#if>
-            </#if>
-            ${"\n"}<#t>
-        </#if>
-    </#list>
-</#macro>
-<#---------------------------------------------------------------------------->
-<#macro span shift=0 >
-    <#local capture>
-        <#nested>
-    </#local>
-    <#local lines = capture?split("\n") >
-    <#list lines as line >
-        <#if ( line?index lt (lines?size - 1) ) >
-            ${line}<#t>
-        </#if>
-    </#list>
-</#macro>
-<#---------------------------------------------------------------------------->
-<#macro renderParam param name>
-    <@join items=param.annotations separator=" " prefix="" suffix=" " />
-   <@join items=param.modifiers separator=" " prefix="" suffix=" " />
-      ${param.type}<#if param.variadic > ...</#if> ${name}<#t>
-  </#macro>
-<#---------------------------------------------------------------------------->
-<#macro renderParams params>
-    <#list params as param >
-        <@renderParam param param.name />
-        <#if param?index lt (params?size - 1) >
+<#macro renderParameters parameters>
+    <#list parameters as parameter >
+        <@renderParameter parameter parameter.name />
+        <#if parameter?index lt (parameters?size - 1) >
             ${", "}<#t>
         </#if>
     </#list>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro renderMethodHeader method>
-    <@join items=method.annotations separator="\n" prefix="" suffix="\n" />
-    <@join items=method.modifiers separator=" " prefix="" suffix=" "/>
-    <@join items=method.typeParameters separator=", " prefix="<" suffix="> " />
-    ${method.result} <#t>
-    ${method.name}(<@renderParams method.parameters/>) <#t>
-    <@join items=method.exceptions separator=", " prefix="throws " suffix=" " /><#t>
+<#macro renderAnnotations annotations>
+    <@common.join items=annotations separator="\n" prefix="" suffix="\n" />
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro renderMethod method>
-    <@block 4>
-        <@renderMethodHeader method />
-        <@block -12>
-            {
-                throw new UnsupportedOperationException("${method.signature} must be implemented.");
-            }
-        </@block>
-    </@block>
+<#macro renderModifiers modifiers>
+    <@common.join items=modifiers separator=" " prefix="" suffix=" "/>
+</#macro>
+<#---------------------------------------------------------------------------->
+<#macro renderTypeParameters typeParameters>
+    <@common.join items=typeParameters separator=", " prefix="<" suffix="> " />
+</#macro>
+<#---------------------------------------------------------------------------->
+<#macro renderTypeParameters typeParameters>
+    <@common.join items=typeParameters separator=", " prefix="<" suffix="> " />
+</#macro>
+<#---------------------------------------------------------------------------->
+<#macro renderExceptions exceptions>
+    <@common.join items=exceptions separator=", " prefix="throws " suffix=" "/>
+</#macro>
+<#---------------------------------------------------------------------------->
+<#macro renderMethodHeader method>
+    <@renderAnnotations method.annotations />
+    <@renderModifiers method.modifiers />
+    <@renderTypeParameters method.typeParameters  />
+    ${method.result} <#t>
+    ${method.name}(<@renderParameters method.parameters/>) <#t>
+    <@renderExceptions method.exceptions/>
+</#macro>
+<#---------------------------------------------------------------------------->
+<#macro renderMethod method >
+    <@renderMethodHeader method/>
+    <@common.block -8> 
+        {
+            throw new UnsupportedOperationException("${method.signature} must be implemented.");
+        }
+    </@common.block>
 </#macro>
 <#---------------------------------------------------------------------------->
 <#macro renderSetterHeader method field>
-    <@join items=method.annotations separator="\n" prefix="" suffix="\n" />
-    <@join items=method.modifiers separator=" " prefix="" suffix=" "/>
-    <@join items=method.typeParameters separator=", " prefix="<" suffix="> " />
+    <@renderAnnotations method.annotations />
+    <@renderModifiers method.modifiers />
+    <@renderTypeParameters method.typeParameters  />
     ${method.result} <#t>
-    ${method.name}(<@renderParam method.parameters[0] field/>) <#t>
-    <@join items=method.exceptions separator=", " prefix="throws " suffix=" " /><#t>
+    ${method.name}(<@renderParameter method.parameters[0] field/>) <#t>
+    <@renderExceptions method.exceptions/>
 </#macro>
 <#---------------------------------------------------------------------------->
 <#macro renderSetter setter field>
-    <@block 4>
-        <@renderSetterHeader setter field/>
-        <@block -12>
-            {
-                this.${field} = ${field};
-            }
-        </@block>
-    </@block>
+    <@renderSetterHeader setter field/>
+    <@common.block -8>
+        {
+            this.${field} = ${field};
+        }
+    </@common.block>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro renderGetter getter field >
-    <@block 4>
-        <@renderMethodHeader getter />
-        <@block -12>
-            {
-              return this.${field};
-            }
-        </@block>
-    </@block>
+<#macro renderGetter getter field>
+    <@renderMethodHeader getter/>
+    <@common.block -8>
+        {
+            return this.${field};
+        }
+    </@common.block>
 </#macro>
 <#---------------------------------------------------------------------------->
 <#macro renderConstructor >
-    <@block -4>
-    <#local var = declare("T", "builder", "other") />
-        public ${id}(final ${id} ${var["other"]}) { 
+    <#local var = declare("that", "builder") />
+    <@common.block -8>
+        public ${moniker}(final ${moniker} ${var["that"]}) { 
             <#list properties as property>
-            this.${property.field} = ${var["other"]}.${property.field};
+            this.${property.field} = ${var["that"]}.${property.field};
             </#list>
         }
-        public <${var["T"]} extends ${type(builder)}<${var["T"]}>> ${id}(${type(builder)}<?> ${var["builder"]}) {
+        protected ${moniker}(final ${type(builder)}<?> ${var["builder"]}) {
             <#list properties as property>
             this.${property.field} = ${var["builder"]}.${property.field};
             </#list>
         }
-    </@block>
+        protected ${moniker}() { }
+    </@common.block>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro renderToString n=4 >
+<#macro renderToString>
     <#local var = declare("sb") />
-    <@block ( n-8 )>
-        @Override
+    <@common.block -8>
+        @${type("java.lang.Override")}
         public String toString() {
-            final StringBuffer ${var["sb"]} = new StringBuffer("${id}{");
+            final StringBuffer ${var["sb"]} = new StringBuffer(this.getClass().getSimpleName());
+            ${var["sb"]}.append("{");
             <#list properties as property>
                 <#if property?index gt 0>
-                    <@block -12 >
+                    <@common.block -12 >
                         ${var["sb"]}.append(", ");
-                    </@block>
+                    </@common.block>
                 </#if>
-                <@block -8 >
-                    ${var["sb"]}.append("${property.name}=").append(this.${property.field});
-                </@block>
+                <@common.block -12>
+                    <#if property.type.string>
+                        ${var["sb"]}.append("${property.name}=");
+                        if( this.${property.field} == null ) {
+                            ${var["sb"]}.append(this.${property.field});
+                        }else{
+                            ${var["sb"]}.append("'").append(this.${property.field}).append("'");
+                        }
+                    <#elseif property.type.array>
+                        ${var["sb"]}.append("${property.name}=").append(Arrays.toString(this.${property.field}));
+                    <#else>
+                        ${var["sb"]}.append("${property.name}=").append(this.${property.field});
+                    </#if>
+                </@common.block>
             </#list>
             ${var["sb"]}.append("}");
             return ${var["sb"]}.toString();
         }
-    </@block>
+    </@common.block>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro renderEquals n=4 >
+<#macro renderEquals >
     <#local var = declare("o", "that") />
-    <@block (n-8)>
-        @Override
+    <@common.block -8>
+        @${type("java.lang.Override")}
         public boolean equals(final ${type("java.lang.Object")} ${var["o"]}) {
             if ( this == ${var["o"]} ) {
                 return true;
@@ -162,47 +145,45 @@
                 return false;
             }
             final ${type(name)} ${var["that"]} = (${type(name)}) ${var["o"]};
-
             <#list properties as property>
-                  <#if property.type.primitive>
-                      <@block -12>
-                          if( this.${property.field} != ${var["that"]}.${property.field} ) {
-                              return false;       
-                          }
-                      </@block>
-                  <#elseif property.type.array>
-                      <@block -12>
-                          if( !${type("java.util.Arrays")}.deepEquals( this.${property.field}, ${var["that"]}.${property.field} ) ) {
-                              return false;
-                          }
-                      </@block>
-                  <#elseif property.comparable>
-                      <@block -12>
-                          if( this.${property.field} != ${var["that"]}.${property.field} )
-                              if( ( this.${property.field} == null ) || ( ${var["that"]}.${property.field} == null ) ||
-                                  ( 0 != this.${property.field}.compareTo( ${var["that"]}.${property.field} ) ) ) 
-                                  return false;
-                      </@block>
-                  <#else>
-                      <@block -12>
-                          if( !${type("java.util.Objects")}.equals( this.${property.field}, ${var["that"]}.${property.field} ) ) {
-                              return false;
-                          }
-                      </@block>
-                  </#if>
+                <#if property.type.primitive>
+                    <@common.block -12>
+                        if( this.${property.field} != ${var["that"]}.${property.field} ) {
+                            return false;       
+                        }
+                    </@common.block>
+                <#elseif property.type.array>
+                    <@common.block -12>
+                        if( !${type("java.util.Arrays")}.deepEquals(this.${property.field}, ${var["that"]}.${property.field}) ) {
+                            return false;
+                        }
+                    </@common.block>
+                <#elseif property.comparable>
+                    <@common.block -12>
+                        if( ( this.${property.field} != null ) ? ( 0 != this.${property.field}.compareTo(${var["that"]}.${property.field}) ) : ( ${var["that"]}.${property.field} != null ) ) {
+                            return false;
+                        }
+                    </@common.block>
+                <#else>
+                    <@common.block -12>
+                        if( !${type("java.util.Objects")}.equals(this.${property.field}, ${var["that"]}.${property.field}) ) {
+                            return false;
+                        }
+                    </@common.block>
+                </#if>
             </#list>
             return true;
         }
-    </@block>
+    </@common.block>
 </#macro>
 <#---------------------------------------------------------------------------->
 <#macro renderHashCode >
     <#local var = declare("result")>
-    <@block -4>
-        @Override
+    <@common.block -8>
+        @${type("java.lang.Override")}
         public int hashCode() {
             int ${var["result"]} = 1;
-            <@block -12>
+            <@common.block -12>
                 <#list properties as property>
                     <#if property.type.array>
                         ${var["result"]} = ( 31 * ${var["result"]} ) + ${type("java.util.Arrays")}.deepHashCode(this.${property.field});
@@ -210,84 +191,104 @@
                         ${var["result"]} = ( 31 * ${var["result"]} ) + ${type("java.util.Objects")}.hashCode(this.${property.field});
                     </#if>
                 </#list>
-            </@block>
+            </@common.block>
             return ${var["result"]};
         }
-    </@block>
+    </@common.block>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro renderBuilder n=4 >
-    <@block (n-8)>
-        <#local var = declare("T") />
+<#macro renderBuilder >
+    <@common.block -8>
+        <#local var = declare("T","that") />
         @${type("java.lang.SuppressWarnings")}("unchecked")
-        public static class Builder<${var["T"]} extends ${type(builder)}<${var["T"]}>> {
+        public static class ${builder.moniker}<${var["T"]} extends ${type(builder)}<${var["T"]}>> {
 
         <#list properties as property>
-            private ${property.type} ${property.field};
+            protected ${property.type} ${property.field};
         </#list>
 
+            public ${builder.moniker}() { }
+            public ${builder.moniker}(final ${builder.moniker} ${var["that"]}) {
+                <#list properties as property>
+                this.${property.field} = ${var["that"]}.${property.field};
+                </#list>
+            }
         <#list properties as property>
             public ${var["T"]} with${property.id}(final ${property.type} ${property.field}) {
                 this.${property.field} = ${property.field};
                 return (${var["T"]}) this;
             }
         </#list>
+            public ${var["T"]} source(final ${type(base)} ${var["that"]}) <@renderExceptions exceptions />{
+                <#list properties as property>
+                    <#if (property.isser)?? >
+                        <@common.block -12>
+                            this.${property.field} = ${var["that"]}.${property.isser.name}();
+                        </@common.block>
+                    <#elseif (property.getter)?? >
+                        <@common.block -12>
+                            this.${property.field} = ${var["that"]}.${property.getter.name}();
+                        </@common.block>
+                    </#if>
+                </#list>
+                return (${var["T"]}) this;
+            }
+            protected ${builder.moniker} validate() {
+              return this;
+            }
             public ${type(name)} build() {
-                return new ${type(name)}(this);
+                return new ${type(name)}(this.validate());
             }
         }
-    </@block>
+    </@common.block>
 </#macro>
 <#---------------------------------------------------------------------------->
-/* This is generated code, edit with caution! */
-/*
- * Copyright 2022-2022 The Billing Project, LLC
- *
- * The Billing Project licenses this file to you under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
+<#macro renderImplementation>
+    <@common.block -8>
+        @${type("com.fasterxml.jackson.databind.annotation.JsonDeserialize")}( builder = ${type(builder)}.class )
+        public class ${moniker} implements ${type(base)}, ${type("java.io.Serializable")} {
 
-package ${package};
+            private static final long serialVersionUID = ${uid};
 
-<#list imports as type>
-import ${type};
-</#list>
+            <#list properties as property>
+            protected <#if property.setters?size lt 0>final </#if>${property.type} ${property.field};
+            </#list>
+            
+            <@common.block 12>
+                <@renderConstructor/>
+                <#list properties as property>
+                    <#if (property.isser)?? >
+                        <@renderGetter property.isser property.field />
+                    </#if>
+                    <#if (property.getter)?? >
+                        <@renderGetter property.getter property.field />
+                    </#if>
+                    <#list property.setters as setter>
+                        <@renderSetter setter property.field />
+                    </#list>
+                </#list>
+                <#list methods as method>
+                    <@renderMethod method />
+                </#list>
+                <@renderEquals />
+                <@renderHashCode />
+                <@renderToString />
 
-public class ${id} implements ${type(base)}, ${type("java.io.Serializable")} {
+                <@renderBuilder />
+            </@common.block>
+        }
+    </@common.block>
+</#macro>
+<#---------------------------------------------------------------------------->
+<#macro render>
+    <@license.render/>
 
-    private static final long serialVersionUID = ${uid};
+    <@unit.package namespace/>
 
-    <#list properties as property>
-    private <#if property.setters?size == 0>final </#if>${property.type} ${property.field};
-    </#list>
+    <@unit.import imports/>
 
-    <@renderConstructor/>
-    <#list properties as property>
-        <#if (property.isser)?? >
-            <@renderGetter property.isser property.field />
-        </#if>
-        <#if (property.getter)?? >
-            <@renderGetter property.getter property.field/>
-        </#if>
-        <#list property.setters as setter>
-            <@renderSetter setter property.field />
-        </#list>
-    </#list>
-    <#list methods as method>
-        <@renderMethod method/>
-    </#list>
-    <@renderEquals/>
-    <@renderHashCode/>
-    <@renderToString/>
-    <@renderBuilder/>
-}
-
+    <@renderImplementation/>
+</#macro>
+<#---------------------------------------------------------------------------->
+<#---------------------------------------------------------------------------->
+<@render/>

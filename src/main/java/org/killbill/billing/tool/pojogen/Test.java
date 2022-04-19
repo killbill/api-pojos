@@ -16,25 +16,48 @@
 
 package org.killbill.billing.tool.pojogen;
 
-public class Test {
-  private static final String SUFFIX = "Test";
-  private final Implementation implementation;
-  public Test(Implementation implementation){
-    this.implementation = implementation;
-  }
-  public String getId(){
-    return this.implementation.getId() + SUFFIX;
-  }
-  public Implementation getImplementation(){
-    return this.implementation;
-  }
-  public String getName(){
-    return this.implementation.getName() + SUFFIX;
-  }
-  public String getNamespace(){
-    return this.implementation.getNamespace() ;
-  }
-  public String getPackage(){
-    return this.implementation.getNamespace() ;
-  }
+import java.util.List;
+
+public class Test extends Unit {
+    private final static String SUFFIX = "Test";
+    private final Implementation target;
+
+    public Test(Entity entity, List<String> imports, Mapping mapping, Symbols symbols,
+                Implementation target) {
+        super(entity, imports, mapping, symbols);
+        this.target = target;
+    }
+
+    public Implementation getTarget() {
+        return this.target;
+    }
+
+    public static Test create(Configuration configuration, Symbols symbols, Implementation implementation) {
+
+        String namespace = implementation.getNamespace();
+        String name = implementation.getName() + SUFFIX;
+        Entity entity = new Entity(namespace, name);
+
+        Importer importer = new Importer(entity, symbols);
+        importer.addJavaDefaults();
+        importer.add(implementation);
+        importer.add(implementation.getBase());
+
+        importer.add("org.testng.Assert");
+        importer.add("org.testng.annotations.Test");
+        importer.add("com.fasterxml.jackson.core.JsonParseException");
+        importer.add("com.fasterxml.jackson.core.JsonProcessingException");
+        importer.add("com.fasterxml.jackson.databind.JsonMappingException");
+        importer.add("com.fasterxml.jackson.databind.ObjectMapper");
+        importer.add("com.fasterxml.jackson.databind.SerializationFeature");
+        importer.add("com.fasterxml.jackson.datatype.joda.JodaModule");
+        importer.add("com.fasterxml.jackson.databind.util.StdDateFormat");
+        importer.add("java.io.IOException");
+
+        List<String> imports = importer.getImports();
+        Mapping mapping = importer.getMapping();
+        symbols = importer.getSymbols();
+
+        return new Test(entity, imports, mapping, symbols, implementation);
+    }
 }

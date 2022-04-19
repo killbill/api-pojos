@@ -16,19 +16,21 @@
 
 package org.killbill.billing.tool.pojogen;
 
-public enum Modifier {
-    ABSTRACT,
-    FINAL,
-    PRIVATE,
-    PROTECTED,
-    PUBLIC,
-    STATIC,
-    SYNCHRONIZED,
-    TRANSIENT,
-    VOLATILE;
+import java.util.List;
 
-    @Override
-    public String toString() {
-        return this.name().toLowerCase();
+public class Service {
+
+    private final List<Module> modules;
+
+    public Service(List<Module> modules) {
+        this.modules = modules;
+    }
+
+    public List<Module> getModules() {
+        return this.modules;
+    }
+
+    public static Service create(List<Module> modules) {
+        return new Service(modules);
     }
 }
