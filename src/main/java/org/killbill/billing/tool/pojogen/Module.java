@@ -23,20 +23,22 @@ public class Module extends Unit {
     private final Entity base;
     private final Resolver resolver;
 
-    public Module(Entity entity, List<String> imports, Mapping mapping, Symbols symbols, 
-            Entity base, Resolver resolver)
-    {
+    public Module(Entity entity, List<String> imports, Mapping mapping, Symbols symbols,
+                  Entity base, Resolver resolver) {
         super(entity, imports, mapping, symbols);
         this.resolver = resolver;
         this.base = base;
     }
-    public Entity getBase(){
+
+    public Entity getBase() {
         return this.base;
     }
-    public Resolver getResolver(){
+
+    public Resolver getResolver() {
         return this.resolver;
     }
-    public static Module create(Configuration configuration, Symbols symbols, Resolver resolver){
+
+    public static Module create(Configuration configuration, Symbols symbols, Resolver resolver) {
         String namespace = resolver.getNamespace();
         String name = Namespaces.join(namespace, configuration.getModule());
         Entity entity = new Entity(namespace, name);
@@ -45,9 +47,9 @@ public class Module extends Unit {
         importer.add(base);
         importer.add(resolver);
         importer.addJavaDefaults();
-        List<String> imports  = importer.getImports();
-        Mapping mapping  = importer.getMapping();
-        symbols =  importer.getSymbols();
+        List<String> imports = importer.getImports();
+        Mapping mapping = importer.getMapping();
+        symbols = importer.getSymbols();
         return new Module(entity, imports, mapping, symbols, base, resolver);
     }
 }

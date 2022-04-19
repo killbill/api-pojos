@@ -24,19 +24,21 @@ public class Resolver extends Unit {
     private final List<Implementation> implementations;
 
     public Resolver(Entity entity, List<String> imports, Mapping mapping, Symbols symbols,
-            Entity base, List<Implementation> implementations)
-    {
+                    Entity base, List<Implementation> implementations) {
         super(entity, imports, mapping, symbols);
         this.implementations = implementations;
         this.base = base;
     }
-    public List<Implementation> getImplementations(){
+
+    public List<Implementation> getImplementations() {
         return this.implementations;
     }
-    public Entity getBase(){
+
+    public Entity getBase() {
         return this.base;
     }
-    public static Resolver create(Configuration configuration, Symbols symbols, String namespace, List<Implementation> implementations){
+
+    public static Resolver create(Configuration configuration, Symbols symbols, String namespace, List<Implementation> implementations) {
 
         String name = Namespaces.join(namespace, configuration.getResolver());
         Entity entity = new Entity(namespace, name);
@@ -44,13 +46,13 @@ public class Resolver extends Unit {
         Importer importer = new Importer(entity, symbols);
         importer.add(base);
         importer.addJavaDefaults();
-        for(Implementation implementation : implementations){
+        for (Implementation implementation : implementations) {
             importer.add(implementation);
             importer.add(implementation.getBase());
         }
-        List<String> imports  = importer.getImports();
-        Mapping mapping  = importer.getMapping();
-        symbols =  importer.getSymbols();
+        List<String> imports = importer.getImports();
+        Mapping mapping = importer.getMapping();
+        symbols = importer.getSymbols();
         return new Resolver(entity, imports, mapping, symbols, base, implementations);
     }
 }

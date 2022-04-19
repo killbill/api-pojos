@@ -16,9 +16,6 @@
 
 package org.killbill.billing.tool.pojogen;
 
-import java.util.HashMap;
-import java.util.Map; 
-
 public class Annotation {
 
     private static final Log log = new Log(Annotation.class);
@@ -27,18 +24,20 @@ public class Annotation {
     private final String name;
     private final Mapping mapping;
 
-    public Annotation(String name, Mapping mapping){
+    public Annotation(String name, Mapping mapping) {
         this(name, null, mapping);
     }
-    public Annotation(String name, String content, Mapping mapping){
+
+    public Annotation(String name, String content, Mapping mapping) {
         this.name = name;
         this.mapping = new Mapping(mapping);
         this.content = content;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         return String.format("@%s%s",
                 this.mapping.resolve(this.name),
-                (this.content ==  null) ? "" : String.format("(%s)", this.content));
+                (this.content == null) ? "" : String.format("(%s)", this.content));
     }
 }

@@ -16,23 +16,15 @@
 
 package org.killbill.billing.tool.pojogen;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.HashMap;
 import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
-import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
-import com.github.javaparser.resolution.types.ResolvedArrayType;
-import com.github.javaparser.resolution.types.ResolvedLambdaConstraintType;
-import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
-import com.github.javaparser.resolution.types.ResolvedReferenceType;
-import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.resolution.types.ResolvedTypeVariable;
-import com.github.javaparser.resolution.types.ResolvedUnionType;
-import com.github.javaparser.resolution.types.ResolvedWildcard;
+import com.github.javaparser.resolution.types.*;
 import com.github.javaparser.utils.Pair;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class Type {
 
@@ -44,170 +36,187 @@ public class Type {
     public static class Param {
         private final ResolvedTypeParameterDeclaration parameter;
         private final Mapping mapping;
-        public Param(ResolvedTypeParameterDeclaration parameter, Mapping mapping){
+
+        public Param(ResolvedTypeParameterDeclaration parameter, Mapping mapping) {
             this.parameter = parameter;
             this.mapping = new Mapping(mapping);
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return toString(this.parameter, this.mapping);
         }
-        public static String toString(ResolvedTypeParameterDeclaration parameter){
+
+        public static String toString(ResolvedTypeParameterDeclaration parameter) {
             return toString(parameter, new Mapping());
         }
-        public static String toString(ResolvedTypeParameterDeclaration parameter, Mapping mapping){
+
+        public static String toString(ResolvedTypeParameterDeclaration parameter, Mapping mapping) {
             return unparse(parameter, mapping, false);
         }
-        public static String unparse(ResolvedTypeParameterDeclaration parameter, Mapping mapping, boolean debug){
+
+        public static String unparse(ResolvedTypeParameterDeclaration parameter, Mapping mapping, boolean debug) {
             StringBuilder s = new StringBuilder();
-            if(debug) s.append(OPENING);
-            if(parameter.hasName()){
-                if(debug){
+            if (debug) s.append(OPENING);
+            if (parameter.hasName()) {
+                if (debug) {
                     s.append(parameter.getName());
-                }else{
+                } else {
                     s.append(mapping.resolve(parameter.getQualifiedName()));
                 }
-            }else{
+            } else {
                 s.append("?");
             }
             List<ResolvedTypeParameterDeclaration.Bound> bounds = parameter.getBounds();
-            if(!bounds.isEmpty()){
-                if(parameter.hasUpperBound()){
+            if (!bounds.isEmpty()) {
+                if (parameter.hasUpperBound()) {
                     s.append(" super ");
                 }
-                if(parameter.hasLowerBound()){
+                if (parameter.hasLowerBound()) {
                     s.append(" extends ");
                 }
-                for(int i = 0 ; i < bounds.size() ; i++){
-                    if( i > 0 ) s.append(" & ");
-                    s.append(Type.unparse(bounds.get(i).getType(), mapping, debug)); 
+                for (int i = 0; i < bounds.size(); i++) {
+                    if (i > 0) s.append(" & ");
+                    s.append(Type.unparse(bounds.get(i).getType(), mapping, debug));
                 }
             }
-            if(debug) s.append(CLOSING);
+            if (debug) s.append(CLOSING);
             return s.toString();
         }
     }
+
     private final ResolvedType type;
     private final Mapping mapping;
 
-    public Type(ResolvedType type, Mapping mapping){
+    public Type(ResolvedType type, Mapping mapping) {
         this.type = type;
         this.mapping = new Mapping(mapping);
     }
-    public boolean isArray(){
+
+    public boolean isArray() {
         return this.type.isArray();
     }
-    public boolean isPrimitive(){
+
+    public boolean isPrimitive() {
         return this.type.isPrimitive();
     }
-    public boolean isString(){
+
+    public boolean isString() {
         return String.class.getName().equals(this.getName());
     }
-    public String getName(){
+
+    public String getName() {
         return toString(this.type);
     }
-    public ResolvedType getType(){
+
+    public ResolvedType getType() {
         return this.type;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         return toString(this.type, this.mapping);
     }
-    public static MethodUsage specialize(MethodUsage method, ResolvedReferenceType reference){
-        for( Pair<ResolvedTypeParameterDeclaration,ResolvedType> pair: reference.getTypeParametersMap()){
+
+    public static MethodUsage specialize(MethodUsage method, ResolvedReferenceType reference) {
+        for (Pair<ResolvedTypeParameterDeclaration, ResolvedType> pair : reference.getTypeParametersMap()) {
             method = method.replaceTypeParameter(pair.a, pair.b);
         }
         return method;
     }
-    public static ResolvedReferenceType specialize(ResolvedReferenceType type, ResolvedReferenceType reference){
+
+    public static ResolvedReferenceType specialize(ResolvedReferenceType type, ResolvedReferenceType reference) {
         return reference.useThisTypeParametersOnTheGivenType(type).asReferenceType();
     }
-    public static List<Type> sort(List<Type> types){
+
+    public static List<Type> sort(List<Type> types) {
         HashMap<String, Type> map = new HashMap<String, Type>();
-        for( Type type : types){
+        for (Type type : types) {
             map.put(type.getName(), type);
         }
         ArrayList<String> index = new ArrayList<String>(map.keySet());
         Collections.sort(index);
         ArrayList<Type> result = new ArrayList<Type>();
-        for(String key : index){
+        for (String key : index) {
             result.add(map.get(key));
         }
         return result;
     }
-    public static String toString(ResolvedType type,Mapping mapping){
+
+    public static String toString(ResolvedType type, Mapping mapping) {
         return unparse(type, mapping, false);
     }
-    public static String toString(ResolvedType type){
+
+    public static String toString(ResolvedType type) {
         return toString(type, new Mapping());
     }
-    public static String unparse(ResolvedType type,Mapping mapping, boolean debug){
+
+    public static String unparse(ResolvedType type, Mapping mapping, boolean debug) {
         StringBuilder s = new StringBuilder();
-        if(debug) s.append(OPENING);
-        if(type.isReferenceType()){
+        if (debug) s.append(OPENING);
+        if (type.isReferenceType()) {
             ResolvedReferenceType reference = type.asReferenceType();
             s.append(mapping.resolve(reference.getQualifiedName()));
-            List<Pair<ResolvedTypeParameterDeclaration,ResolvedType>>	parameters = reference.getTypeParametersMap();
-            if(!parameters.isEmpty()){
+            List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> parameters = reference.getTypeParametersMap();
+            if (!parameters.isEmpty()) {
                 s.append("<");
-                for( int i = 0; i < parameters.size() ; i++ ){
-                    if(i > 0){
+                for (int i = 0; i < parameters.size(); i++) {
+                    if (i > 0) {
                         s.append(", ");
                     }
                     s.append(unparse(parameters.get(i).b, mapping, debug));
                 }
                 s.append(">");
             }
-        }else if( type.isTypeVariable() ){
+        } else if (type.isTypeVariable()) {
             ResolvedTypeVariable variable = type.asTypeVariable();
             ResolvedTypeParameterDeclaration parameter = variable.asTypeParameter();
-            if(debug){
+            if (debug) {
                 s.append(parameter.getName());
-            }else{
+            } else {
                 s.append(mapping.resolve(parameter.getQualifiedName()));
             }
-        }
-        else if(type.isWildcard()){
+        } else if (type.isWildcard()) {
             ResolvedWildcard wildcard = type.asWildcard();
             s.append("?");
-            if(wildcard.isBounded()){
-                if(wildcard.isUpperBounded()){
+            if (wildcard.isBounded()) {
+                if (wildcard.isUpperBounded()) {
                     s.append(" super ");
                 }
-                if(wildcard.isLowerBounded()){
+                if (wildcard.isLowerBounded()) {
                     s.append(" extends ");
                 }
-                s.append(unparse(wildcard.getBoundedType(), mapping, debug)); 
+                s.append(unparse(wildcard.getBoundedType(), mapping, debug));
             }
-        }else if(type.isArray()){
+        } else if (type.isArray()) {
             ResolvedArrayType array = type.asArrayType();
-            s.append(unparse(array.getComponentType(), mapping, debug)); 
-            s.append("[]"); 
-        }else if(type.isConstraint()){
+            s.append(unparse(array.getComponentType(), mapping, debug));
+            s.append("[]");
+        } else if (type.isConstraint()) {
             ResolvedLambdaConstraintType constraint = type.asConstraintType();
             s.append("?");
             s.append(" super ");
             s.append(unparse(constraint.getBound(), mapping, debug));
-        }else if(type.isUnionType()){
+        } else if (type.isUnionType()) {
             ResolvedUnionType union = type.asUnionType();
             s.append(union.describe());
-        }else if(type.isVoid()){
+        } else if (type.isVoid()) {
             s.append(type.describe());
-        }else if(type.isNull()){
+        } else if (type.isNull()) {
             s.append(type.describe());
-        }else if(type.isPrimitive()){
+        } else if (type.isPrimitive()) {
             ResolvedPrimitiveType primitive = type.asPrimitive();
             s.append(primitive.describe());
-        }else if(type.isInferenceVariable()){
+        } else if (type.isInferenceVariable()) {
             s.append(type.describe());
-        }else if(type.isNumericType()){
+        } else if (type.isNumericType()) {
             s.append(type.describe());
-        }else if(type.isReference()){
+        } else if (type.isReference()) {
             s.append(type.describe());
-        }else{
+        } else {
             s.append(type.describe());
         }
-        if(debug) s.append(CLOSING);
+        if (debug) s.append(CLOSING);
         return s.toString();
     }
 }

@@ -26,8 +26,9 @@ public enum Modifier {
     SYNCHRONIZED,
     TRANSIENT,
     VOLATILE;
+
     @Override
-    public String toString(){
+    public String toString() {
         return this.name().toLowerCase();
     }
 }

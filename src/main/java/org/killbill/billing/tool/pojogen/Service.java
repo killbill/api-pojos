@@ -18,18 +18,19 @@ package org.killbill.billing.tool.pojogen;
 
 import java.util.List;
 
-public class Service{
+public class Service {
 
     private final List<Module> modules;
 
-    public Service(List<Module> modules)
-    {
+    public Service(List<Module> modules) {
         this.modules = modules;
     }
-    public List<Module> getModules(){
+
+    public List<Module> getModules() {
         return this.modules;
     }
-    public static Service create(List<Module> modules){
+
+    public static Service create(List<Module> modules) {
         return new Service(modules);
     }
 }

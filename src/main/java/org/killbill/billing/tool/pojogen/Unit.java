@@ -16,8 +16,8 @@
 
 package org.killbill.billing.tool.pojogen;
 
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Unit extends Entity {
@@ -28,50 +28,55 @@ public abstract class Unit extends Entity {
     protected final Symbols symbols;
     protected final List<String> imports;
 
-    public Unit(Entity entity, List<String> imports, Mapping mapping, Symbols symbols)
-    {
+    public Unit(Entity entity, List<String> imports, Mapping mapping, Symbols symbols) {
         super(entity);
         this.imports = imports;
         this.mapping = mapping;
         this.symbols = symbols;
-    } 
-    public List<String> getImports(){
+    }
+
+    public List<String> getImports() {
         return this.imports;
     }
-    public Symbols getSymbols(){
+
+    public Symbols getSymbols() {
         return this.symbols;
     }
-    public Map<String,String> declare(String... vargs){
-        Map<String,String> map = new HashMap<String,String>();
+
+    public Map<String, String> declare(String... vargs) {
+        Map<String, String> map = new HashMap<String, String>();
         int attempts = 0;
-        while(true){
+        while (true) {
             map.clear();
             boolean valid = true;
-            for(int i = 0 ; i < vargs.length ; i++){
+            for (int i = 0; i < vargs.length; i++) {
                 String name = newVarName(vargs[i], attempts);
                 map.put(vargs[i], name);
-                if(this.symbols.contains(name)){
+                if (this.symbols.contains(name)) {
                     valid = false;
                     break;
                 }
             }
-            if(valid){
+            if (valid) {
                 break;
             }
             attempts++;
         }
         return map;
     }
-    protected String newVarName(String name, int attempts){
-        if(attempts > 0){
+
+    protected String newVarName(String name, int attempts) {
+        if (attempts > 0) {
             name = name + attempts;
         }
         return name;
     }
-    public String type(String name){
+
+    public String type(String name) {
         return this.mapping.resolve(name);
     }
-    public String type(Entity entity){
+
+    public String type(Entity entity) {
         return this.mapping.resolve(entity);
     }
 }

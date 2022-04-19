@@ -23,15 +23,16 @@ public class Test extends Unit {
     private final Implementation target;
 
     public Test(Entity entity, List<String> imports, Mapping mapping, Symbols symbols,
-            Implementation target)
-    {
+                Implementation target) {
         super(entity, imports, mapping, symbols);
         this.target = target;
     }
-    public Implementation getTarget(){
+
+    public Implementation getTarget() {
         return this.target;
     }
-    public static Test create(Configuration configuration, Symbols symbols, Implementation implementation){
+
+    public static Test create(Configuration configuration, Symbols symbols, Implementation implementation) {
 
         String namespace = implementation.getNamespace();
         String name = implementation.getName() + SUFFIX;
@@ -53,9 +54,9 @@ public class Test extends Unit {
         importer.add("com.fasterxml.jackson.databind.util.StdDateFormat");
         importer.add("java.io.IOException");
 
-        List<String> imports  = importer.getImports();
-        Mapping mapping  = importer.getMapping();
-        symbols =  importer.getSymbols();
+        List<String> imports = importer.getImports();
+        Mapping mapping = importer.getMapping();
+        symbols = importer.getSymbols();
 
         return new Test(entity, imports, mapping, symbols, implementation);
     }

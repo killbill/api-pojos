@@ -16,15 +16,17 @@
 
 package org.killbill.billing.tool.pojogen;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import org.apache.commons.io.IOUtils;
+
 public class Resources {
 
     private static final Log log = new Log(Resources.class);
 
-    public static String asString(String name) throws Exception{
+    public static String asString(String name) throws Exception {
         String result = null;
         StringWriter writer = new StringWriter();
         InputStream input = Resources.class.getClassLoader().getResourceAsStream(name);

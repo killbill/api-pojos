@@ -27,42 +27,52 @@ public class Entity {
     protected final String namespace;
     protected final String reference;
 
-    public Entity(ResolvedTypeDeclaration declaration){
+    public Entity(ResolvedTypeDeclaration declaration) {
         this(declaration.getPackageName(), declaration.getQualifiedName());
     }
+
     public Entity(String name) {
         this(name.substring(0, name.lastIndexOf('.')), name);
     }
+
     public Entity(Entity that) {
-        this(that.namespace, that.name);  
+        this(that.namespace, that.name);
     }
+
     public Entity(String namespace, String name) {
         this.namespace = namespace;
         this.name = name;
         this.id = name.substring(this.namespace.length() + 1);
         String[] path = this.id.split("\\.");
-        this.reference=  path[0];
+        this.reference = path[0];
         this.moniker = path[path.length - 1];
         this.export = this.namespace + "." + this.reference;
     }
+
     public String getExport() {
         return this.export;
     }
+
     public String getId() {
         return this.id;
     }
+
     public String getMoniker() {
         return this.moniker;
     }
+
     public String getName() {
         return this.name;
     }
+
     public String getNamespace() {
         return this.namespace;
     }
+
     public String getReference() {
         return this.reference;
     }
+
     @Override
     public String toString() {
         return this.name;

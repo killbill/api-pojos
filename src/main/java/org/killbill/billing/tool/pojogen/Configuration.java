@@ -19,10 +19,8 @@ package org.killbill.billing.tool.pojogen;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 class Configuration {
@@ -37,7 +35,7 @@ class Configuration {
     private final String builder;
     private final String module;
     private final String prefix;
-    private final String resolver; 
+    private final String resolver;
     private final String subpackage;
     private final String suffix;
     private final Templates templates;
@@ -47,7 +45,7 @@ class Configuration {
     private final Set<String> interfaces;
     private final Set<String> namespaces;
 
-    public Configuration(Charset encoding, Templates templates, Settings settings){
+    public Configuration(Charset encoding, Templates templates, Settings settings) {
         this.encoding = encoding;
         this.settings = settings;
         this.templates = templates;
@@ -58,58 +56,72 @@ class Configuration {
         this.namespaces = new HashSet<String>(this.settings.getPackages());
         this.test = this.settings.getTest();
         this.resource = this.settings.getResource();
-        this.subpackage  = this.settings.getSubpackage();
+        this.subpackage = this.settings.getSubpackage();
         this.suffix = this.settings.getSuffix();
-        this.prefix= this.settings.getPrefix();
+        this.prefix = this.settings.getPrefix();
         this.resolver = this.settings.getResolver();
         this.module = this.settings.getModule();
-        this.output = this.settings.getOutput() ;
+        this.output = this.settings.getOutput();
         this.builder = this.settings.getBuilder();
     }
-    public String rename(String namespace, String name){
-        String id = Namespaces.id(namespace,name);
-        return  Namespaces.join( rename(namespace) , this.prefix + id + this.suffix );
+
+    public String rename(String namespace, String name) {
+        String id = Namespaces.id(namespace, name);
+        return Namespaces.join(rename(namespace), this.prefix + id + this.suffix);
     }
-    public String rename(String namespace){
-        return  Namespaces.join(namespace, this.subpackage);
+
+    public String rename(String namespace) {
+        return Namespaces.join(namespace, this.subpackage);
     }
-    public boolean accepts(String namespace, String name){
-        if(this.namespaces.isEmpty() && this.interfaces.isEmpty()){
+
+    public boolean accepts(String namespace, String name) {
+        if (this.namespaces.isEmpty() && this.interfaces.isEmpty()) {
             return true;
-        }else{
-            return this.namespaces.contains(namespace)|| this.interfaces.contains(name);
+        } else {
+            return this.namespaces.contains(namespace) || this.interfaces.contains(name);
         }
     }
-    public boolean isComparable(String name){
+
+    public boolean isComparable(String name) {
         return this.comparables.contains(name);
     }
-    public String getBuilder(){
+
+    public String getBuilder() {
         return this.builder;
     }
+
     public List<File> getDependencies() {
         return this.dependencies;
     }
+
     public Charset getEncoding() {
         return this.encoding;
     }
-    public String getModule(){
+
+    public String getModule() {
         return this.module;
     }
+
     public File getOutput() {
         return this.output;
     }
-    public String getResolver(){
+
+    public String getResolver() {
         return this.resolver;
     }
+
     public File getResource() {
         return this.resource;
     }
+
     public List<File> getSources() {
         return this.sources;
     }
-    public  Templates getTemplates() {
+
+    public Templates getTemplates() {
         return this.templates;
     }
+
     public File getTest() {
         return this.test;
     }
