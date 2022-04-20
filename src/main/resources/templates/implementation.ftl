@@ -144,34 +144,38 @@
             if ( ( ${var["o"]} == null ) || ( this.getClass() != ${var["o"]}.getClass() ) ) {
                 return false;
             }
-            final ${type(name)} ${var["that"]} = (${type(name)}) ${var["o"]};
-            <#list properties as property>
-                <#if property.type.primitive>
-                    <@common.block -12>
-                        if( this.${property.field} != ${var["that"]}.${property.field} ) {
-                            return false;       
-                        }
-                    </@common.block>
-                <#elseif property.type.array>
-                    <@common.block -12>
-                        if( !${type("java.util.Arrays")}.deepEquals(this.${property.field}, ${var["that"]}.${property.field}) ) {
-                            return false;
-                        }
-                    </@common.block>
-                <#elseif property.comparable>
-                    <@common.block -12>
-                        if( ( this.${property.field} != null ) ? ( 0 != this.${property.field}.compareTo(${var["that"]}.${property.field}) ) : ( ${var["that"]}.${property.field} != null ) ) {
-                            return false;
-                        }
-                    </@common.block>
-                <#else>
-                    <@common.block -12>
-                        if( !${type("java.util.Objects")}.equals(this.${property.field}, ${var["that"]}.${property.field}) ) {
-                            return false;
-                        }
-                    </@common.block>
-                </#if>
-            </#list>
+            <#if properties?size gt 0 >
+                <@common.block -8>
+                    final ${type(name)} ${var["that"]} = (${type(name)}) ${var["o"]};
+                    <#list properties as property>
+                        <#if property.type.primitive>
+                            <@common.block -12>
+                                if( this.${property.field} != ${var["that"]}.${property.field} ) {
+                                    return false;       
+                                }
+                            </@common.block>
+                        <#elseif property.type.array>
+                            <@common.block -12>
+                                if( !${type("java.util.Arrays")}.deepEquals(this.${property.field}, ${var["that"]}.${property.field}) ) {
+                                    return false;
+                                }
+                            </@common.block>
+                        <#elseif property.comparable>
+                            <@common.block -12>
+                                if( ( this.${property.field} != null ) ? ( 0 != this.${property.field}.compareTo(${var["that"]}.${property.field}) ) : ( ${var["that"]}.${property.field} != null ) ) {
+                                    return false;
+                                }
+                            </@common.block>
+                        <#else>
+                            <@common.block -12>
+                                if( !${type("java.util.Objects")}.equals(this.${property.field}, ${var["that"]}.${property.field}) ) {
+                                    return false;
+                                }
+                            </@common.block>
+                        </#if>
+                    </#list>
+                </@common.block>
+            </#if>
             return true;
         }
     </@common.block>
