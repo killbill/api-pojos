@@ -250,7 +250,7 @@
 <#macro renderImplementation>
     <@common.block -8>
         @${type("com.fasterxml.jackson.databind.annotation.JsonDeserialize")}( builder = ${type(builder)}.class )
-        public class ${moniker} implements ${type(base)}, ${type("java.io.Serializable")} {
+        public class ${moniker} implements ${type(base)} {
 
             private static final long serialVersionUID = ${uid};
 
