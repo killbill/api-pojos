@@ -252,8 +252,6 @@
         @${type("com.fasterxml.jackson.databind.annotation.JsonDeserialize")}( builder = ${type(builder)}.class )
         public class ${moniker} implements ${type(base)} {
 
-            private static final long serialVersionUID = ${uid};
-
             <#list properties as property>
             protected <#if property.setters?size lt 0>final </#if>${property.type} ${property.field};
             </#list>
