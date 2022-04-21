@@ -134,7 +134,6 @@ public class Implementation extends Unit {
         importer.add(base);
         importer.add(builder);
         importer.addJavaDefaults();
-        importer.add("java.io.Serializable");
         importer.add("java.util.Arrays");
         importer.add("java.util.Objects");
         importer.add("com.fasterxml.jackson.databind.annotation.JsonDeserialize");
