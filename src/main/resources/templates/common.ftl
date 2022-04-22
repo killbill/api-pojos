@@ -1,6 +1,25 @@
+
+<#----------------------------------------------------------------------------|
+
+  Copyright 2022-2022 The Billing Project, LLC
+
+  The Billing Project licenses this file to you under the Apache License, 
+  version 2.0 (the "License"); you may not use this file except in compliance 
+  with the License.  You may obtain a copy of the License at:
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations
+  under the License.
+
+|----------------------------------------------------------------------------->
+
+
 <#---------------------------------------------------------------------------->
 <#import "string.ftl" as string>
-<#---------------------------------------------------------------------------->
 <#---------------------------------------------------------------------------->
 <#function _indent input count=0 >
     <#if count == 0>
@@ -22,15 +41,15 @@
     </#if>
 </#function>
 <#---------------------------------------------------------------------------->
-<#macro println value>
+<#macro println value="" >
   ${value}${"\n"}<#t>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro print value>
+<#macro print value="" >
   ${value}<#t>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro block right=0 bottom=0 top=0 >
+<#macro block left=0 bottom=0 top=0 >
     <#local capture>
         <#nested>
     </#local>
@@ -56,7 +75,7 @@
     <#local output = [] >
     <#list lines as line >
         <#if ( ( line?index gte start ) &&  ( line?index lt end ) ) >
-            <#local result = _indent(line, right) >
+            <#local result = _indent(line, left) >
             <#if ( result?length gt 0 ) >
                 <#local output += [ result ] >
             <#else>
@@ -79,4 +98,19 @@
         <@print ( prefix + items?join(separator) + suffix ) />
     </#if>
 </#macro>
+<#---------------------------------------------------------------------------->
+<#macro border left="" right="" >
+    <#local capture>
+        <#nested>
+    </#local>
+    <#local lines = capture?split("\n") >
+    <#local output = [] >
+    <#list lines as line >
+       <#local input = string.right_trim(line)>
+       <#local input = string.right_trim( left + input + right )>
+       <#local output += [ input ] >
+    </#list>
+    <@print output?join("\n") />
+</#macro>
+<#---------------------------------------------------------------------------->
 <#---------------------------------------------------------------------------->
