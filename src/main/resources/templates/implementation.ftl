@@ -1,5 +1,5 @@
 <#import "common.ftl" as common>
-<#import "license.ftl" as license>
+<#import "header.ftl" as header>
 <#import "unit.ftl" as unit>
 <#---------------------------------------------------------------------------->
 <#macro renderParameter parameter name>
@@ -283,7 +283,7 @@
 </#macro>
 <#---------------------------------------------------------------------------->
 <#macro render>
-    <@license.render/>
+    <@header.render/>
 
     <@unit.package namespace/>
 

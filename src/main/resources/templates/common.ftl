@@ -1,7 +1,6 @@
 <#---------------------------------------------------------------------------->
 <#import "string.ftl" as string>
 <#---------------------------------------------------------------------------->
-<#---------------------------------------------------------------------------->
 <#function _indent input count=0 >
     <#if count == 0>
         <#return input >
@@ -22,15 +21,15 @@
     </#if>
 </#function>
 <#---------------------------------------------------------------------------->
-<#macro println value>
+<#macro println value="" >
   ${value}${"\n"}<#t>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro print value>
+<#macro print value="" >
   ${value}<#t>
 </#macro>
 <#---------------------------------------------------------------------------->
-<#macro block right=0 bottom=0 top=0 >
+<#macro block left=0 bottom=0 top=0 >
     <#local capture>
         <#nested>
     </#local>
@@ -56,7 +55,7 @@
     <#local output = [] >
     <#list lines as line >
         <#if ( ( line?index gte start ) &&  ( line?index lt end ) ) >
-            <#local result = _indent(line, right) >
+            <#local result = _indent(line, left) >
             <#if ( result?length gt 0 ) >
                 <#local output += [ result ] >
             <#else>
@@ -79,4 +78,19 @@
         <@print ( prefix + items?join(separator) + suffix ) />
     </#if>
 </#macro>
+<#---------------------------------------------------------------------------->
+<#macro border left="" right="" >
+    <#local capture>
+        <#nested>
+    </#local>
+    <#local lines = capture?split("\n") >
+    <#local output = [] >
+    <#list lines as line >
+       <#local input = string.right_trim(line)>
+       <#local input = string.right_trim( left + input + right )>
+       <#local output += [ input ] >
+    </#list>
+    <@print output?join("\n") />
+</#macro>
+<#---------------------------------------------------------------------------->
 <#---------------------------------------------------------------------------->

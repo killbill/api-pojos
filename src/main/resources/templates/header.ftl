@@ -4,19 +4,15 @@
 <#import "text/generator.ftl" as generator>
 <#---------------------------------------------------------------------------->
 <#macro render>
-    <@common.border "#  ">
+/*
+    <@common.border " *  ">
         <@generator.render/>
         <@common.println/>
         <@common.println/>
         <@license.render/>
     </@common.border>
     <@common.println/>
-    <@common.println/>
-    <#list modules as module>
-      <@common.println module.name />
-    </#list>
+ */
 </#macro>
 <#---------------------------------------------------------------------------->
 <#---------------------------------------------------------------------------->
-<@render/>
-

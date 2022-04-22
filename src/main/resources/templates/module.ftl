@@ -1,5 +1,5 @@
 <#import "common.ftl" as common>
-<#import "license.ftl" as license>
+<#import "header.ftl" as header>
 <#import "unit.ftl" as unit>
 <#---------------------------------------------------------------------------->
 <#macro renderModule>
@@ -18,7 +18,7 @@
 <#---------------------------------------------------------------------------->
 <#macro render>
     <@common.block>
-        <@license.render/>
+        <@header.render/>
 
         <@unit.package namespace/>
 
