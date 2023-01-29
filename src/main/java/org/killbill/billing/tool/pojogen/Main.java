@@ -28,13 +28,51 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-@Command(name = "pojogen", version = "pojogen 1.1", mixinStandardHelpOptions = true)
+@Command(name = "pojogen", version = "pojogen 1.2", mixinStandardHelpOptions = true)
 public class Main implements Callable<Integer> {
     private static final Log log = new Log(Main.class);
+
     @Option(names = {"-v", "--verbose"}, description = "Print extra information during processing.")
     private boolean verbose;
+
     @Option(names = {"-e", "--example"}, description = "Print an example of a settings file to stdout and exit.")
     private boolean example;
+
+    @Option(names = "--input",
+            description = "Top level directory of interface classes.\n  Example: ./killbill-api/src/main/java.")
+    private String input;
+
+    @Option(names = "--input-dependencies",
+            split = ",",
+            description = "Location of JAR/library needed by -s/--source classes. \n" +
+                    "Default value: <USER_HOME>/.m2")
+    private String inputDependencies;
+
+    @Option(names = "--input-packages",
+            split = ",",
+            description = "Comma-separated of package names in '--input' that should generated.\n" +
+                          "  Default value: All packages in killbill-api project. Example:\n" +
+                          "  com.acme.foo,com.acme.bar")
+    private String[] inputPackages;
+
+    @Option(names = "--output",
+            description = "Top Level directory of generated classes location. Example:\n" +
+                          "  ./killbill-plugin-framework-java/src/main/java")
+    private String output;
+
+    @Option(names = "--output-subpackage", description = "Sub-package location for generated classes.\n  Default value: boilerplate")
+    private String outputSubPackage;
+
+    @Option(names = "--output-resources",
+            description = "Top Level directory of generated resources location. Example:\n" +
+                          "  ./killbill-plugin-framework-java/src/main/resources")
+    private String outputResources;
+
+    @Option(names = "--output-test",
+            description = "Top Level directory of generated resources location. Example:\n" +
+                          "  ./killbill-plugin-framework-java/src/test/java")
+    private String test;
+
     @Parameters(arity = "0..1", paramLabel = "settings.xml", description = "Specify the location of the settings file.")
     private List<File> location;
 
@@ -56,46 +94,70 @@ public class Main implements Callable<Integer> {
         return this.verbose;
     }
 
-    public Integer call() {
-        try {
-            if (this.verbose) {
-                Log.setGlobal(Level.TRACE);
-            }
-            log.trace(this);
-            if (this.example) {
-                System.out.println(Resources.asString("settings.xml"));
-                return 0;
-            }
-            Settings settings = null;
-            File location = null;
+    private void printExample() {
+        if (this.example) {
             try {
-                if (this.location != null && this.location.size() > 0) {
-                    location = this.location.get(0);
-                }
-                if (location == null) {
-                    log.warn("No setting file has been specified. Looking for settings.xml in current directory.");
-                    location = new File("settings.xml");
-                }
-                settings = Settings.read(location);
+                System.out.println(Resources.asString("settings.xml"));
             } catch (Exception e) {
-                log.fatal(e);
-                log.fatal("The settings file <%s> cannot be read. Exiting.", location);
-                return 1;
+                throw new RuntimeException("Example 'settings.xml' not found: " + e.getMessage());
             }
-            log.trace("Settings: %s\n%s", this.location, settings);
-            Charset encoding = StandardCharsets.UTF_8;
-            String cwd = System.getProperty("user.dir");
-            Templates templates = new Templates(encoding, Resources.class, "/templates");
-            Configuration configuration = new Configuration(encoding, templates, settings);
+        }
+    }
+
+    public Integer call() {
+        printExample();
+        if (this.example) {
+            // Quick exit if asking for example
+            return 0;
+        }
+
+        if (this.verbose) {
+            Log.setGlobal(Level.TRACE);
+        }
+        log.trace(this);
+
+        final Settings settings;
+        try {
+            final File settingsXml = location == null ? null : location.get(0);
+
+            SettingsLoader settingsLoader = new SettingsLoader(settingsXml);
+            settingsLoader.overrideInputDependencyDirectory(inputDependencies);
+            settingsLoader.overrideInputDirectory(input);
+            settingsLoader.overrideInputPackagesDirectory(inputPackages);
+            settingsLoader.overrideOutputDirectory(output);
+            settingsLoader.overrideOutputSubpackageDirectory(outputSubPackage);
+            settingsLoader.overrideOutputResourcesDirectory(outputResources);
+            settingsLoader.overrideOutputTestDirectory(test);
+
+            settings = settingsLoader.getSettings();
+        } catch (Exception e) {
+            log.error("Error when load settings: " + e);
+            if (verbose) {
+                e.printStackTrace();
+            }
+            return 1;
+        }
+
+        log.trace("Settings: %s\n%s", this.location, settings);
+        Charset encoding = StandardCharsets.UTF_8;
+        Templates templates = new Templates(encoding, Resources.class, "/templates");
+        Configuration configuration = new Configuration(encoding, templates, settings);
+        try {
             Generator generator = new Generator(configuration);
             generator.run();
         } catch (Exception e) {
-            log.fatal(e);
+            log.error("Error when running generator: " + e);
+            if (verbose) {
+                e.printStackTrace();
+            }
+            return 1;
         }
+
         return 0;
     }
 
     public static void main(String[] args) {
+        System.setProperty("picocli.ignore.invalid.split", "true");
         System.exit(new CommandLine(new Main()).execute(args));
     }
 }

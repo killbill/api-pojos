@@ -21,13 +21,13 @@
       In a Java Package Structure, each subdirectory of corresponds to a Java package.
   -->
   <sourceDirectories>
-    <sourceDirectory>input/project/src/main/java</sourceDirectory>
+    <sourceDirectory>./killbill-api/src/main/java</sourceDirectory>
   </sourceDirectories>
   <!--
-    The directories containing Jar dependencies of the source code.
+    The directories containing Jar dependencies of the source code. If empty, it will try to set to local maven repository.
   -->
   <dependencyDirectories>
-    <dependencyDirectory>input/lib</dependencyDirectory>
+    <dependencyDirectory></dependencyDirectory>
   </dependencyDirectories>
   <!--
     The subpackage to place the generated classes.
@@ -44,15 +44,15 @@
   <!--
     The directory to output the Java Package Structure of the POJOs.
   -->
-  <outputDirectory>output/project/src/main/java</outputDirectory>
+  <outputDirectory>./killbill-plugin-framework-java/src/main/java</outputDirectory>
   <!--
     The directory to place the generated resources.
   -->
-  <resourceDirectory>output/project/src/main/resources</resourceDirectory>
+  <resourceDirectory>./killbill-plugin-framework-java/src/main/resources</resourceDirectory>
   <!--
-    The directory to output the Java Package Structure of the the test units.
+    The directory to output the Java Package Structure of the test units.
   -->
-  <testDirectory>output/project/src/test/java</testDirectory>
+  <testDirectory>./killbill-plugin-framework-java/src/test/java</testDirectory>
   <!--
     Generate output for the following packages.
   -->
