@@ -21,6 +21,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public class TestSettingsLoader {
 
@@ -59,11 +60,11 @@ public class TestSettingsLoader {
     }
 
     @Test(groups = "fast")
-    void overrideInputDependencyDirectory() {
+    void overrideSourceDependencyDirectory() {
         final SettingsLoader settingsLoader = getSettingsLoader(null);
         Assert.assertTrue(settingsLoader.getSettings().getDependencies().get(0).getPath().contains("m2"));
 
-        settingsLoader.overrideInputDependencyDirectory("src"); // This is maven its own structure
+        settingsLoader.overrideSourceDependencyDirectories("src"); // This is maven its own structure
         Assert.assertFalse(settingsLoader.getSettings().getDependencies().get(0).getPath().contains("m2"));
         Assert.assertTrue(settingsLoader.getSettings().getDependencies().get(0).getPath().contains("src"));
 
@@ -71,15 +72,17 @@ public class TestSettingsLoader {
     }
 
     @Test(groups = "fast")
-    void overrideInputDirectory() {
+    void overrideSourceDirectory() {
         final SettingsLoader settingsLoader = getSettingsLoader(null);
         Assert.assertTrue(settingsLoader.getSettings().getSources().get(0).getPath().contains("killbill-api"));
 
-        settingsLoader.overrideInputDirectory("src");
+        settingsLoader.overrideSourceDirectories("src", Path.of("src", "main").toString(), Path.of("src", "test").toString());
         Assert.assertFalse(settingsLoader.getSettings().getSources().get(0).getPath().contains("killbill-api"));
         Assert.assertTrue(settingsLoader.getSettings().getSources().get(0).getPath().contains("src"));
+        Assert.assertTrue(settingsLoader.getSettings().getSources().get(1).getPath().contains("main"));
+        Assert.assertTrue(settingsLoader.getSettings().getSources().get(2).getPath().contains("test"));
 
-        Assert.assertThrows(IllegalArgumentException.class, () -> settingsLoader.overrideInputDirectory("non-existent"));
+        Assert.assertThrows(IllegalArgumentException.class, () -> settingsLoader.overrideSourceDirectories("non-existent"));
     }
 
     @Test(groups = "fast")
@@ -88,7 +91,7 @@ public class TestSettingsLoader {
         // Default settings.xml contains all killbill-api packages
         Assert.assertTrue(settingsLoader.getSettings().getPackages().size() > 30);
 
-        settingsLoader.overrideInputPackagesDirectory(new String[] {"com.acme.foo", "com.acme.helper", "com.acme.blah"});
+        settingsLoader.overrideSourcePackagesDirectory(new String[] {"com.acme.foo", "com.acme.helper", "com.acme.blah"});
         Assert.assertEquals(settingsLoader.getSettings().getPackages().size(), 3);
     }
 
@@ -126,7 +129,7 @@ public class TestSettingsLoader {
         Assert.assertEquals(settingsLoader.getSettings().getSubpackage(), "impl");
     }
 
-    @Test
+    @Test(groups = "fast")
     void overrideOutputResourcesDirectory() {
         final SettingsLoader settingsLoader = getSettingsLoader(null);
         Assert.assertTrue(settingsLoader.getSettings().getResource().getPath().contains("resources"));
@@ -147,7 +150,7 @@ public class TestSettingsLoader {
         }
     }
 
-    @Test
+    @Test(groups = "fast")
     void overrideOutputTestDirectory() {
         final SettingsLoader settingsLoader = getSettingsLoader(null);
         Assert.assertTrue(settingsLoader.getSettings().getTest().getPath().contains("test"));

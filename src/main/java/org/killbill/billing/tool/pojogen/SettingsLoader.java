@@ -21,7 +21,7 @@ import org.apache.commons.io.FileUtils;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,7 +52,9 @@ class SettingsLoader {
             settings.getDependencies().isEmpty() ||
             settings.getDependencies().get(0) == null /* this one is weird: value is [null] */) {
             // Set dependency to local maven repository by default
-            settings.setDependencyDirectories(List.of(new File(FileUtils.getUserDirectoryPath() + SEPARATOR + ".m2")));
+            final File m2Dir = new File(FileUtils.getUserDirectoryPath() + SEPARATOR + ".m2");
+            // use new ArrayList(List.of()) to make getDependencies() mutable. See #overrideSourceDependencyDirectories()
+            settings.setDependencyDirectories(new ArrayList<>(List.of(m2Dir)));
         }
     }
 
@@ -62,34 +64,54 @@ class SettingsLoader {
         return Settings.read(file);
     }
 
-    void overrideInputDependencyDirectory(final String inputDependencies) {
-        if (isStringExist(inputDependencies)) {
-            final File file = new File(inputDependencies);
-            if (isFileExist(file)) {
-                log.trace("Override inputDependencies directory to: " + inputDependencies);
-                settings.setDependencyDirectories(List.of(file));
-            } else {
-                throw new IllegalArgumentException("Set '--input-dependencies' to non-existent directory: " + inputDependencies);
+    void overrideSourceDependencyDirectories(final String... sourceDependencyDirs) {
+        if (sourceDependencyDirs == null) {
+            return;
+        }
+
+        // We don't use source defined in XML configuration anymore.
+        settings.getDependencies().clear();
+
+        for (final String inputDependency : sourceDependencyDirs) {
+            if (isStringExist(inputDependency)) {
+                final File file = new File(inputDependency);
+                if (isFileExist(file)) {
+                    settings.getDependencies().add(file);
+                } else {
+                    log.warn("One of --source-dependency-dirs arguments point to non existent directory: " + file);
+                }
             }
         }
     }
 
-    void overrideInputDirectory(final String input) {
-        if (isStringExist(input)) {
-            final File inputFile = new File(input);
-            if (isFileExist(inputFile)) {
-                log.trace("Override input directory to: " + input);
-                settings.setSources(Collections.singletonList(inputFile));
-            } else {
-                throw new IllegalArgumentException("Set '--input' to non-existent directory");
+    void overrideSourceDirectories(final String... srcDirs) {
+        if (srcDirs == null) {
+            return;
+        }
+
+        // We don't use source defined in XML configuration anymore.
+        settings.getSources().clear();
+
+        for (final String srcDir : srcDirs) {
+            if (isStringExist(srcDir)) {
+                final File inputFile = new File(srcDir);
+                if (isFileExist(inputFile)) {
+                    settings.getSources().add(inputFile);
+                } else {
+                    log.warn("One of --source-dirs arguments point to non existent directory: " + inputFile);
+                }
             }
+        }
+
+        if (settings.getSources().isEmpty()) {
+            throw new IllegalArgumentException("Set '--source-dirs' to non-existent directory");
         }
     }
 
-    void overrideInputPackagesDirectory(String[] inputPackages) {
-        if (inputPackages != null && inputPackages.length > 0) {
-            final List<String> packages = List.of(inputPackages);
-            log.trace("Set '--input-packages' directory to: " + packages);
+    void overrideSourcePackagesDirectory(String[] sourcePackages) {
+        if (sourcePackages != null && sourcePackages.length > 0) {
+            final List<String> packages = List.of(sourcePackages);
+            log.trace("Set '--source-packages' directory to: " + packages);
             settings.setPackages(packages);
         }
     }

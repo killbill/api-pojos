@@ -38,22 +38,24 @@ public class Main implements Callable<Integer> {
     @Option(names = {"-e", "--example"}, description = "Print an example of a settings file to stdout and exit.")
     private boolean example;
 
-    @Option(names = "--input",
-            description = "Top level directory of interface classes.\n  Example: ./killbill-api/src/main/java.")
-    private String input;
-
-    @Option(names = "--input-dependencies",
+    @Option(names = "--source-dirs",
             split = ",",
-            description = "Location of JAR/library needed by -s/--source classes. \n" +
+            description = "Top level directory of interface classes.\n  Default value: ./killbill-api/src/main/java . Or, " +
+                          "./killbill-plugin-api/catalog/src/main/java,./killbill-plugin-api/control/src/main/java")
+    private String[] sourceDirs;
+
+    @Option(names = "--source-dependency-dirs",
+            split = ",",
+            description = "Location of JAR/library needed by --source-dirs classes. \n" +
                     "Default value: <USER_HOME>/.m2")
-    private String inputDependencies;
+    private String[] sourceDependencyDirs;
 
     @Option(names = "--input-packages",
             split = ",",
-            description = "Comma-separated of package names in '--input' that should generated.\n" +
+            description = "Comma-separated of package names in '--source-dirs' should generated.\n" +
                           "  Default value: All packages in killbill-api project. Example:\n" +
                           "  com.acme.foo,com.acme.bar")
-    private String[] inputPackages;
+    private String[] sourcePackages;
 
     @Option(names = "--output",
             description = "Top Level directory of generated classes location. Example:\n" +
@@ -121,9 +123,9 @@ public class Main implements Callable<Integer> {
             final File settingsXml = location == null ? null : location.get(0);
 
             SettingsLoader settingsLoader = new SettingsLoader(settingsXml);
-            settingsLoader.overrideInputDependencyDirectory(inputDependencies);
-            settingsLoader.overrideInputDirectory(input);
-            settingsLoader.overrideInputPackagesDirectory(inputPackages);
+            settingsLoader.overrideSourceDirectories(sourceDirs);
+            settingsLoader.overrideSourceDependencyDirectories(sourceDependencyDirs);
+            settingsLoader.overrideSourcePackagesDirectory(sourcePackages);
             settingsLoader.overrideOutputDirectory(output);
             settingsLoader.overrideOutputSubpackageDirectory(outputSubPackage);
             settingsLoader.overrideOutputResourcesDirectory(outputResources);
