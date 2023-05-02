@@ -30,7 +30,7 @@ public class TestSettingsLoader {
             final File file = settingsXml == null ?
                     null :
                     new File(Resources.getResource(settingsXml).toURI());
-            return new SettingsLoader(file);
+            return new SettingsLoader(file, ProjectSourceType.API);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -88,7 +88,7 @@ public class TestSettingsLoader {
     @Test(groups = "fast")
     void overrideInputPackagesDirectory() {
         final SettingsLoader settingsLoader = getSettingsLoader(null);
-        // Default settings.xml contains all killbill-api packages
+        // Default killbill-api-config.xml contains all killbill-api packages
         Assert.assertTrue(settingsLoader.getSettings().getPackages().size() > 30);
 
         settingsLoader.overrideSourcePackagesDirectory(new String[] {"com.acme.foo", "com.acme.helper", "com.acme.blah"});

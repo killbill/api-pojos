@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2022-2022 The Billing Project, LLC
+
+  The Billing Project licenses this file to you under the Apache License, 
+  version 2.0 (the "License"); you may not use this file except in compliance 
+  with the License.  You may obtain a copy of the License at:
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations
+  under the License.
+-->
+<Settings>
+  <!--
+      The directories containing Java source code. 
+      Each directory should be the root directory of a Java Package Structure.
+      In a Java Package Structure, each subdirectory of corresponds to a Java package.
+  -->
+  <sourceDirectories>
+    <sourceDirectory>./killbill-plugin-api/catalog/src/main/java</sourceDirectory>
+    <sourceDirectory>./killbill-plugin-api/control/src/main/java</sourceDirectory>
+    <sourceDirectory>./killbill-plugin-api/currency/src/main/java</sourceDirectory>
+    <sourceDirectory>./killbill-plugin-api/entitlement/src/main/java</sourceDirectory>
+    <sourceDirectory>./killbill-plugin-api/invoice/src/main/java</sourceDirectory>
+    <sourceDirectory>./killbill-plugin-api/notification/src/main/java</sourceDirectory>
+    <sourceDirectory>./killbill-plugin-api/payment/src/main/java</sourceDirectory>
+  </sourceDirectories>
+  <!--
+    The directories containing Jar dependencies of the source code. If empty, it will try to set to local maven repository.
+  -->
+  <dependencyDirectories>
+    <dependencyDirectory></dependencyDirectory>
+  </dependencyDirectories>
+  <!--
+    The subpackage to place the generated classes.
+  -->
+  <outputSubpackage>boilerplate</outputSubpackage>
+  <!--
+    The prefix of the generated class name.
+  -->
+  <outputClassPrefix></outputClassPrefix>
+  <!--
+    The suffix of the generated class name.
+  -->
+  <outputClassSuffix>Imp</outputClassSuffix>
+  <!--
+    The directory to output the Java Package Structure of the POJOs.
+  -->
+  <outputDirectory>./killbill-plugin-framework-java/src/main/java</outputDirectory>
+  <!--
+    The directory to place the generated resources.
+  -->
+  <resourceDirectory>./killbill-plugin-framework-java/src/main/resources</resourceDirectory>
+  <!--
+    The directory to output the Java Package Structure of the test units.
+  -->
+  <testDirectory>./killbill-plugin-framework-java/src/test/java</testDirectory>
+  <!--
+    Generate output for the following packages.
+  -->
+  <acceptedPackages>
+    <package>org.killbill.billing.catalog.plugin.api</package>
+    <package>org.killbill.billing.control.plugin.api</package>
+    <package>org.killbill.billing.currency.plugin.api</package>
+    <package>org.killbill.billing.entitlement.plugin.api</package>
+    <package>org.killbill.billing.invoice.plugin.api</package>
+    <package>org.killbill.billing.notification.plugin.api</package>
+    <package>org.killbill.billing.payment.plugin.api</package>
+  </acceptedPackages>
+  <!--
+    Generate output for the following interfaces.
+  -->
+  <acceptedInterfaces>
+  <!--
+    <interface> org.killbill.billing.catalog.api.Unit</interface>
+  -->
+  </acceptedInterfaces>
+  <!--
+    The list of types to use Comparable.compareTo() instead of Object.equals() for equality.
+  -->
+  <comparableTypes>
+      <type>java.math.BigDecimal</type>
+      <type>org.joda.time.DateTime</type>
+      <type>org.joda.time.LocalDate</type>
+  </comparableTypes>
+  <!--
+    The name of the static inner class implementing the Builder pattern for each generate POJO.
+  -->
+  <builderClass>Builder</builderClass>
+  <!--
+    The name of the class extending `com.fasterxml.jackson.databind.AbstractTypeResolver' for each package.
+  -->
+  <resolverClass>Resolver</resolverClass>
+  <!--
+    The name of the class extending `com.fasterxml.jackson.databind.Module` for each package.
+  -->
+  <moduleClass>Module</moduleClass>
+ </Settings>
+

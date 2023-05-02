@@ -20,10 +20,8 @@ import org.apache.commons.io.FileUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 class SettingsLoader {
 
@@ -39,9 +37,9 @@ class SettingsLoader {
      * Create an instance with optional settings.xml . If null, then setting configuration will load from default
      * settings.xml in the classpath. If user try to set to non-existent file, then exception.
      */
-    SettingsLoader(@Nullable final File settingsXml) throws Exception {
+    SettingsLoader(@Nullable final File settingsXml, final ProjectSourceType projectSourceType) throws Exception {
         if (settingsXml == null) {
-            settings = getFromClasspath();
+            settings = projectSourceType.getDefaultSettings();
         } else if (!settingsXml.exists()) {
             throw new Exception("Try to use settingsXml: '" + settingsXml.getAbsolutePath() + "' but it's not exist");
         } else {
@@ -56,12 +54,6 @@ class SettingsLoader {
             // use new ArrayList(List.of()) to make getDependencies() mutable. See #overrideSourceDependencyDirectories()
             settings.setDependencyDirectories(new ArrayList<>(List.of(m2Dir)));
         }
-    }
-
-    private Settings getFromClasspath() throws Exception {
-        File file = Files.createTempFile("", "").toFile();
-        FileUtils.copyInputStreamToFile(Objects.requireNonNull(getClass().getResourceAsStream("/settings.xml")), file);
-        return Settings.read(file);
     }
 
     void overrideSourceDependencyDirectories(final String... sourceDependencyDirs) {
