@@ -32,10 +32,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.apache.commons.io.output.FileWriterWithEncoding;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 public class Generator {
@@ -202,10 +204,44 @@ public class Generator {
 
     private void write(File output, String content) throws Exception {
         FileUtils.forceMkdirParent(output);
-        try (FileWriterWithEncoding writer = new FileWriterWithEncoding(output, this.configuration.getEncoding())) {
+        try (BufferedWriter writer = Files.newBufferedWriter(output.toPath(), this.configuration.getEncoding())) {
             writer.write(content);
         }
     }
+
+    /**
+     * <p>Special case of {@link #write(File, String)} where we need to append the output file properly.</p>
+     *
+     * <p>
+     *     Current {@link #write(File, String)} implementation always rewrite generated files. This is Ok for most cases,
+     *     but causing a problem for shared files between multiple sources.
+     * </p>
+     *
+     * <p>
+     *     Example: {@link #render(Service)} use {@code com.fasterxml.jackson.databind.Module} file to put all module(s)
+     *     from any sources/project. For example, {@code killbill-api} and {@code killbill-plugin-api} will use this
+     *     file together. Using just {@link #write(File, String)} lead a problem like explained in
+     *     <a href="https://github.com/killbill/api-pojos/issues/12">this issue</a> .
+     * </p>
+     */
+    private void writeOrAppend(File output, String content) throws Exception {
+        boolean outputExist = output != null && output.exists();
+        if (outputExist) {
+            final List<String> contentList = List.of(content.split(System.lineSeparator()));
+            final List<String> outputContentList = FileUtils.readLines(output, this.configuration.getEncoding());
+            try (final BufferedWriter writer = Files.newBufferedWriter(output.toPath(), configuration.getEncoding(), StandardOpenOption.APPEND)) {
+                for (final String contentLine : contentList) {
+                    if (!outputContentList.contains(contentLine)) {
+                        writer.write(contentLine);
+                        writer.newLine();
+                    }
+                }
+            }
+        } else {
+            write(output, content);
+        }
+    }
+
 
     private void render(Implementation implementation) throws Exception {
         File output = Namespaces.file(this.configuration.getOutput(), implementation.getNamespace(), implementation.getName());
@@ -229,7 +265,7 @@ public class Generator {
     private void render(Service service) throws Exception {
         File output = new File(this.configuration.getResource(), "META-INF/services/com.fasterxml.jackson.databind.Module");
         String content = this.configuration.getTemplates().render(service);
-        write(output, content);
+        writeOrAppend(output, content);
     }
 
     private void render(Test test) throws Exception {
