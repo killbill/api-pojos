@@ -79,7 +79,7 @@ public class Main implements Callable<Integer> {
                           "  ./killbill-plugin-framework-java/src/test/java")
     private String test;
 
-    @Parameters(arity = "0..1", paramLabel = "killbill-api-config.xml", description = "Specify the location of the XML configuration file.")
+    @Parameters(arity = "0..1", paramLabel = "config.xml", description = "Specify the location of the XML configuration file.")
     private List<File> location;
 
     public Main() {

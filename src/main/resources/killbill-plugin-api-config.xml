@@ -37,8 +37,13 @@
   </dependencyDirectories>
   <!--
     The subpackage to place the generated classes.
+
+    There's reason why the value is "boilerplate.plugin" instead of following the same value as killbill-api-config.xml:
+    https://github.com/killbill/api-pojos/issues/11 (see the comment)
+    killbill-api has a package named "org.killbill.billing.payment.plugin.api". Thus, when generated `killbill-plugin-api`
+    project, the "payment" in killbill-api get truncated by killbill-plugin-api payment module.
   -->
-  <outputSubpackage>boilerplate</outputSubpackage>
+  <outputSubpackage>boilerplate.plugin</outputSubpackage>
   <!--
     The prefix of the generated class name.
   -->

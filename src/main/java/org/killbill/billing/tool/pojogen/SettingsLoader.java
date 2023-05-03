@@ -70,7 +70,7 @@ class SettingsLoader {
                 if (isFileExist(file)) {
                     settings.getDependencies().add(file);
                 } else {
-                    log.warn("One of --source-dependency-dirs arguments point to non existent directory: " + file);
+                    log.warn("One of --source-dependency-dirs arguments point to non existent directory: {}", file);
                 }
             }
         }
@@ -90,7 +90,7 @@ class SettingsLoader {
                 if (isFileExist(inputFile)) {
                     settings.getSources().add(inputFile);
                 } else {
-                    log.warn("One of --source-dirs arguments point to non existent directory: " + inputFile);
+                    log.warn("One of --source-dirs arguments point to non existent directory: {}", inputFile);
                 }
             }
         }
@@ -103,7 +103,7 @@ class SettingsLoader {
     void overrideSourcePackagesDirectory(String[] sourcePackages) {
         if (sourcePackages != null && sourcePackages.length > 0) {
             final List<String> packages = List.of(sourcePackages);
-            log.trace("Set '--source-packages' directory to: " + packages);
+            log.trace("Set '--source-packages' directory to: {}", packages);
             settings.setPackages(packages);
         }
     }
@@ -112,7 +112,7 @@ class SettingsLoader {
         if (isStringExist(output)) {
             final File file = new File(output);
             if (isFileExist(file)) {
-                log.trace("Set '--output' directory to: " + output);
+                log.trace("Set '--output' directory to: {}", output);
                 settings.setOutput(file);
 
                 String location = file.getAbsolutePath();
@@ -128,7 +128,7 @@ class SettingsLoader {
 
     public void overrideOutputSubpackageDirectory(String outputSubPackage) {
         if (outputSubPackage != null && !outputSubPackage.isBlank()) {
-            log.trace("Override outputSubPackage directory to: " + outputSubPackage);
+            log.trace("Override outputSubPackage directory to: {}", outputSubPackage);
             settings.setSubpackage(outputSubPackage);
         }
     }
@@ -141,7 +141,7 @@ class SettingsLoader {
         if (isStringExist(outputResources)) {
             final File file = new File(outputResources);
             if (isFileExist(file)) {
-                log.trace("Set '--output-resources' directory to: " + outputResources);
+                log.trace("Set '--output-resources' directory to: {}", outputResources);
                 settings.setResource(file);
             } else {
                 final String msg = "Set '--output-resources' to non-existent directory.";
@@ -162,7 +162,7 @@ class SettingsLoader {
         if (isStringExist(test)) {
             final File file = new File(test);
             if (isFileExist(file)) {
-                log.trace("Set '--output-test' directory to: " + test);
+                log.trace("Set '--output-test' directory to: {}", test);
                 settings.setTest(file);
             } else {
                 final String msg = "Set '--output-test' to non-existent directory";
