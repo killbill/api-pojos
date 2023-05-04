@@ -42,13 +42,13 @@ This will run the tool with the default configuration options.
 To generate POJOs for the [killbill-api](https://github.com/killbill/killbill-api) repo, you can run `java -jar pojogen.jar`
 
 Note that this will run the command with the default configuration 
-defined in `<api-pojos>/src/main/resources/killbill-api-config.xml`.
+defined in [killbill-api-config.xml](https://github.com/killbill/api-pojos/blob/main/src/main/resources/killbill-api-config.xml)
 
 ### Generate POJOs for killbill-plugin-api
 
 To generate POJOs for the [killbill-plugin-api](https://github.com/killbill/killbill-plugin-api) repo, you can run 
 `java -jar pojogen.jar --source-project=plugin-api`. Note that this will run the command with the default configuration 
-defined in `<api-pojos>/src/main/resources/killbill-plugin-api-config.xml`. 
+defined in [killbill-plugin-api-config.xml](https://github.com/killbill/api-pojos/blob/main/src/main/resources/killbill-plugin-api-config.xml). 
 
 The `--source-project` option is needed here because its default value is `api`. `--source-project` is also only useful if 
 you do not specify `<sourceDirectories />` in XML configuration or `--source-dirs` via the command line.
@@ -56,7 +56,8 @@ you do not specify `<sourceDirectories />` in XML configuration or `--source-dir
 ### Override XML configuration file
 
 To override configuration file, you can run,  `java -jar pojogen.jar overridden-api-config.xml`. You can copy
-`<api-pojos>/src/main/resources/killbill-api-config.xml` or `<api-pojos>/src/main/resources/killbill-plugin-api-config.xml`, 
+[killbill-api-config.xml](https://github.com/killbill/api-pojos/blob/main/src/main/resources/killbill-api-config.xml) or
+[killbill-plugin-api-config.xml](https://github.com/killbill/api-pojos/blob/main/src/main/resources/killbill-plugin-api-config.xml), 
 put them in the same directory as `pojogen.jar`, and edit configuration values as needed.
 
 ### Override configuration using `--<option>`
@@ -67,9 +68,13 @@ put them in the same directory as `pojogen.jar`, and edit configuration values a
    - It will override `<outputSubpackage />` from `boilerplate` to `impl`.
    - Generate `killbill-api` POJOs to `killbill-plugin-framework-java`. 
    - XML configuration file is not specified, so the command above will using the default
-     `<api-pojos>/src/main/resources/killbill-api-config.xml` configuration.
+     [killbill-api-config.xml](https://github.com/killbill/api-pojos/blob/main/src/main/resources/killbill-api-config.xml) 
+     configuration.
 
-2. `java -jar pojogen.jar --source-dirs=./killbill-plugin-api/catalog/src/main/java,./killbill-plugin-api/control/src/main/java overriden-config.xml`.
+2. 
+```shell 
+java -jar pojogen.jar --source-dirs=./killbill-plugin-api/catalog/src/main/java,./killbill-plugin-api/control/src/main/java overriden-config.xml
+```
    This will: 
    - Generate POJOs for only the `catalog` and `control` modules from `killbill-plugin-api`.
    - Will use `overriden-config.xml` as the XML configuration instead of the default configuration
