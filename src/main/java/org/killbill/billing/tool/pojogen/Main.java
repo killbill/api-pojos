@@ -38,22 +38,28 @@ public class Main implements Callable<Integer> {
     @Option(names = {"-e", "--example"}, description = "Print an example of a settings file to stdout and exit.")
     private boolean example;
 
-    @Option(names = "--input",
-            description = "Top level directory of interface classes.\n  Example: ./killbill-api/src/main/java.")
-    private String input;
+    @Option(names = "--source-project",
+            description = "The project source. Currently, the valid value only: 'api' or 'plugin-api'. Default value: api")
+    private String sourceProject;
 
-    @Option(names = "--input-dependencies",
+    @Option(names = "--source-dirs",
             split = ",",
-            description = "Location of JAR/library needed by -s/--source classes. \n" +
+            description = "Top level directory of interface classes.\n  Default value: ./killbill-api/src/main/java . Or, " +
+                          "./killbill-plugin-api/catalog/src/main/java,./killbill-plugin-api/control/src/main/java")
+    private String[] sourceDirs;
+
+    @Option(names = "--source-dependency-dirs",
+            split = ",",
+            description = "Location of JAR/library needed by --source-dirs classes. \n" +
                     "Default value: <USER_HOME>/.m2")
-    private String inputDependencies;
+    private String[] sourceDependencyDirs;
 
-    @Option(names = "--input-packages",
+    @Option(names = "--source-packages",
             split = ",",
-            description = "Comma-separated of package names in '--input' that should generated.\n" +
+            description = "Comma-separated of package names in '--source-dirs' should generated.\n" +
                           "  Default value: All packages in killbill-api project. Example:\n" +
                           "  com.acme.foo,com.acme.bar")
-    private String[] inputPackages;
+    private String[] sourcePackages;
 
     @Option(names = "--output",
             description = "Top Level directory of generated classes location. Example:\n" +
@@ -73,7 +79,7 @@ public class Main implements Callable<Integer> {
                           "  ./killbill-plugin-framework-java/src/test/java")
     private String test;
 
-    @Parameters(arity = "0..1", paramLabel = "settings.xml", description = "Specify the location of the settings file.")
+    @Parameters(arity = "0..1", paramLabel = "config.xml", description = "Specify the location of the XML configuration file.")
     private List<File> location;
 
     public Main() {
@@ -97,9 +103,9 @@ public class Main implements Callable<Integer> {
     private void printExample() {
         if (this.example) {
             try {
-                System.out.println(Resources.asString("settings.xml"));
+                System.out.println(Resources.asString("killbill-api-config.xml"));
             } catch (Exception e) {
-                throw new RuntimeException("Example 'settings.xml' not found: " + e.getMessage());
+                throw new RuntimeException("Example 'killbill-api-config.xml' not found: " + e.getMessage());
             }
         }
     }
@@ -116,14 +122,18 @@ public class Main implements Callable<Integer> {
         }
         log.trace(this);
 
+        final ProjectSourceType projectSourceType = sourceProject == null || sourceProject.isBlank() ?
+                ProjectSourceType.API :
+                ProjectSourceType.valueOf(sourceProject.replace("-", "_").toUpperCase());
+
         final Settings settings;
         try {
             final File settingsXml = location == null ? null : location.get(0);
 
-            SettingsLoader settingsLoader = new SettingsLoader(settingsXml);
-            settingsLoader.overrideInputDependencyDirectory(inputDependencies);
-            settingsLoader.overrideInputDirectory(input);
-            settingsLoader.overrideInputPackagesDirectory(inputPackages);
+            SettingsLoader settingsLoader = new SettingsLoader(settingsXml, projectSourceType);
+            settingsLoader.overrideSourceDirectories(sourceDirs);
+            settingsLoader.overrideSourceDependencyDirectories(sourceDependencyDirs);
+            settingsLoader.overrideSourcePackagesDirectory(sourcePackages);
             settingsLoader.overrideOutputDirectory(output);
             settingsLoader.overrideOutputSubpackageDirectory(outputSubPackage);
             settingsLoader.overrideOutputResourcesDirectory(outputResources);

@@ -67,7 +67,7 @@ The `<Settings>` element is the root element of the xml file.
 
   * `<builderClass>`            - The name of the static inner class implementing the Builder pattern for each generated POJO
 
-  * `<resolverClass>`           - The name of the class implementing `com.fasterxml.jackson.databind.AbstractTypeResolver' for each package
+  * `<resolverClass>`           - The name of the class implementing `com.fasterxml.jackson.databind.AbstractTypeResolver` for each package
 
   * `<moduleClass>`             - The name of the class implementing `com.fasterxml.jackson.databind.Module` for each package
 
