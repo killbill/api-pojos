@@ -28,6 +28,7 @@
     <sourceDirectory>./killbill-plugin-api/invoice/src/main/java</sourceDirectory>
     <sourceDirectory>./killbill-plugin-api/notification/src/main/java</sourceDirectory>
     <sourceDirectory>./killbill-plugin-api/payment/src/main/java</sourceDirectory>
+    <sourceDirectory>./killbill-plugin-api/usage/src/main/java</sourceDirectory>
   </sourceDirectories>
   <!--
     The directories containing Jar dependencies of the source code. If empty, it will try to set to local maven repository.
@@ -75,6 +76,7 @@
     <package>org.killbill.billing.invoice.plugin.api</package>
     <package>org.killbill.billing.notification.plugin.api</package>
     <package>org.killbill.billing.payment.plugin.api</package>
+    <package>org.killbill.billing.usage.plugin.api</package>
   </acceptedPackages>
   <!--
     Generate output for the following interfaces.
